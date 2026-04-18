@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>GymOS — Crea Scheda</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--gold:#DAA520;--gold2:#F5C842;--green:#00CC66;--red:#FF3333;--bg:#080808;--card:#141414;--card2:#1c1c1c;--border:#2a2a2a;--text:#f0f0f0;--muted:#666;--muted2:#999}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;overflow:hidden}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;display:flex;flex-direction:column}
+header{background:#0d0d0d;border-bottom:1px solid var(--border);padding:0 20px;height:52px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;position:relative;z-index:10}
+.logo{font-family:'Bebas Neue',sans-serif;font-size:1.5rem;letter-spacing:3px;color:var(--gold)}
+.logo span{color:var(--text);opacity:.4}
+.steps{display:flex;align-items:center;gap:6px;position:absolute;left:50%;transform:translateX(-50%)}
+.step-dot{width:8px;height:8px;border-radius:50%;background:var(--border);transition:all .3s}
+.step-dot.active{background:var(--gold);width:20px;border-radius:4px}
+.step-dot.done{background:var(--green)}
+main{flex:1;overflow-y:auto;overflow-x:hidden;padding:0 0 100px}
+main::-webkit-scrollbar{width:3px}
+main::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+.screen{display:none;animation:fadeUp .35s ease}
+.screen.active{display:block}
+@keyframes fadeUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+.hero{min-height:calc(100vh - 52px - 80px);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 24px;text-align:center}
+.hero-title{font-family:'Bebas Neue',sans-serif;font-size:3rem;letter-spacing:4px;line-height:1;margin-bottom:8px;background:linear-gradient(135deg,var(--gold),var(--gold2));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.hero-sub{font-size:.9rem;color:var(--muted2);margin-bottom:40px;letter-spacing:.5px}
+.big-input{background:transparent;border:none;border-bottom:2px solid var(--gold);color:var(--text);font-family:'Bebas Neue',sans-serif;font-size:2.2rem;letter-spacing:3px;text-align:center;width:100%;max-width:300px;outline:none;padding:8px 0;caret-color:var(--gold)}
+.big-input::placeholder{color:var(--muted)}
+.section-wrap{padding:24px 20px 0}
+.section-tag{font-family:'Bebas Neue',sans-serif;font-size:.85rem;letter-spacing:3px;color:var(--gold);margin-bottom:6px}
+.section-title{font-size:1.4rem;font-weight:600;margin-bottom:4px}
+.section-sub{font-size:.82rem;color:var(--muted2);margin-bottom:20px}
+.day-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding:0 20px}
+.day-btn{aspect-ratio:1;border-radius:12px;background:var(--card);border:2px solid var(--border);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;transition:all .2s;font-family:'Bebas Neue',sans-serif}
+.day-btn .num{font-size:2.2rem;color:var(--muted);line-height:1}
+.day-btn .label{font-size:.65rem;letter-spacing:2px;color:var(--muted);margin-top:2px}
+.day-btn.selected{border-color:var(--gold);background:#1a1500}
+.day-btn.selected .num,.day-btn.selected .label{color:var(--gold)}
+.day-btn:active{transform:scale(.96)}
+.muscoli-grid{display:flex;flex-wrap:wrap;gap:8px;padding:0 20px}
+.muscolo-chip{padding:8px 16px;border-radius:24px;background:var(--card);border:1px solid var(--border);font-size:.82rem;font-weight:500;cursor:pointer;transition:all .2s;user-select:none}
+.muscolo-chip.selected{background:#1a1500;border-color:var(--gold);color:var(--gold)}
+.giorno-tabs{display:flex;gap:0;overflow-x:auto;padding:0 20px;border-bottom:1px solid var(--border);scrollbar-width:none}
+.giorno-tabs::-webkit-scrollbar{display:none}
+.gtab{flex-shrink:0;padding:10px 18px;font-size:.8rem;letter-spacing:1px;font-family:'Bebas Neue',sans-serif;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;transition:all .2s}
+.gtab.active{color:var(--gold);border-bottom-color:var(--gold)}
+.es-wrap{padding:0 20px}
+.es-card{background:var(--card);border:1px solid var(--border);border-radius:12px;margin-bottom:10px;overflow:hidden;transition:border-color .2s}
+.es-card.open{border-color:var(--gold)}
+.es-card-header{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;cursor:pointer}
+.es-num{font-family:'Bebas Neue',sans-serif;font-size:.75rem;letter-spacing:2px;color:var(--muted);margin-right:10px}
+.es-name-preview{font-size:.9rem;font-weight:500;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-right:6px}
+.es-tipo-pill{font-size:.65rem;letter-spacing:1.5px;font-family:'Bebas Neue',sans-serif;padding:3px 8px;border-radius:4px;margin-right:8px;flex-shrink:0}
+.pill-normale{background:#0d1f0d;color:var(--green);border:1px solid #1a3a1a}
+.pill-circuito{background:#1f1400;color:var(--gold);border:1px solid #3a2a00}
+.es-card-body{padding:0 14px 14px;display:none}
+.es-card.open .es-card-body{display:block}
+.field{margin-top:12px}
+.field label{font-size:.7rem;letter-spacing:1.5px;color:var(--muted);text-transform:uppercase;display:block;margin-bottom:5px}
+.field input,.field select,.field textarea{width:100%;background:#0e0e0e;border:1px solid var(--border);border-radius:8px;color:var(--text);padding:10px 12px;font-size:.9rem;font-family:'DM Sans',sans-serif;outline:none;transition:border-color .2s;-webkit-appearance:none}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--gold)}
+.field select option{background:#141414}
+.field textarea{resize:none;height:70px;line-height:1.5}
+.row-fields-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.search-wrap{position:relative;margin-bottom:8px}
+.search-input{width:100%;background:#0e0e0e;border:1px solid var(--border);border-radius:8px;color:var(--text);padding:10px 12px 10px 36px;font-size:.9rem;outline:none;transition:border-color .2s;font-family:'DM Sans',sans-serif}
+.search-input:focus{border-color:var(--gold)}
+.search-icon{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--muted);pointer-events:none}
+.search-results{background:#0e0e0e;border:1px solid var(--border);border-radius:8px;max-height:180px;overflow-y:auto;display:none}
+.search-results.open{display:block}
+.search-item{padding:10px 12px;font-size:.88rem;cursor:pointer;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.search-item:last-child{border-bottom:none}
+.search-item:active{background:var(--card2)}
+.search-item .es-gruppo{font-size:.68rem;color:var(--muted);letter-spacing:1px;flex-shrink:0;margin-left:8px}
+.tipo-toggle{display:flex;gap:8px;margin-top:5px}
+.tipo-opt{flex:1;padding:9px;border-radius:7px;text-align:center;border:1px solid var(--border);cursor:pointer;font-size:.8rem;font-weight:500;transition:all .2s;background:var(--card);color:var(--muted2)}
+.tipo-opt.active-normale{background:#0d1f0d;border-color:var(--green);color:var(--green)}
+.tipo-opt.active-circuito{background:#1f1400;border-color:var(--gold);color:var(--gold)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:12px 20px;border-radius:10px;border:none;cursor:pointer;font-size:.88rem;font-weight:600;font-family:'DM Sans',sans-serif;transition:all .2s}
+.btn:active{transform:scale(.97)}
+.btn:disabled{opacity:.3;cursor:not-allowed}
+.btn-gold{background:var(--gold);color:#000}
+.btn-green{background:var(--green);color:#000}
+.btn-gray{background:var(--card2);color:var(--text);border:1px solid var(--border)}
+.btn-ghost{background:transparent;color:var(--muted2);border:1px solid var(--border)}
+.btn-red{background:#2a0000;color:var(--red);border:1px solid #5a0000}
+.btn-sm{padding:7px 14px;font-size:.78rem;border-radius:7px}
+.bottom-bar{position:fixed;bottom:0;left:0;right:0;background:#0d0d0d;border-top:1px solid var(--border);padding:12px 20px;display:flex;gap:10px;z-index:10}
+.btn-back{width:52px;flex-shrink:0;padding:0}
+.btn-next{flex:1}
+.summary-card{background:var(--card);border:1px solid var(--border);border-radius:12px;margin:0 20px 12px;padding:16px}
+.summary-day-title{font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:2px;color:var(--gold);margin-bottom:10px}
+.summary-es{padding:6px 0;border-bottom:1px solid var(--border);font-size:.85rem;display:flex;align-items:center;gap:8px}
+.summary-es:last-child{border-bottom:none}
+.dot-v{width:6px;height:6px;border-radius:50%;background:var(--green);flex-shrink:0}
+.dot-g{width:6px;height:6px;border-radius:50%;background:var(--gold);flex-shrink:0}
+.ble-big{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 24px;text-align:center;gap:16px}
+.ble-icon{font-size:3rem}
+.ble-label{font-family:'Bebas Neue',sans-serif;font-size:1.2rem;letter-spacing:3px;color:var(--muted2)}
+.prog-outer{width:100%;background:var(--border);border-radius:10px;height:6px;margin:4px 0;overflow:hidden;display:none}
+.prog-outer.show{display:block}
+.prog-inner{height:100%;background:var(--gold);border-radius:10px;width:0;transition:width .3s}
+.ble-log{margin:0 20px;background:#0a0a0a;border:1px solid var(--border);border-radius:8px;padding:10px 12px;font-size:.72rem;font-family:monospace;color:var(--muted);max-height:140px;overflow-y:auto}
+.ble-log .ok{color:var(--green)}.ble-log .err{color:var(--red)}.ble-log .info{color:var(--gold)}
+.add-btn-wrap{padding:0 20px;margin-top:6px}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">GYM<span>OS</span></div>
+  <div class="steps" id="steps-ind"></div>
+  <div style="width:60px"></div>
+</header>
+<main id="ms">
+
+<!-- STEP 1 -->
+<div class="screen active" id="screen-1">
+  <div class="hero">
+    <div class="hero-title">CIAO,<br>BENVENUTO!</div>
+    <div class="hero-sub">CREIAMO LA TUA SCHEDA PERSONALIZZATA</div>
+    <input class="big-input" type="text" id="input-nome" placeholder="IL TUO NOME" maxlength="24" autocomplete="off">
+  </div>
+</div>
+
+<!-- STEP 2 -->
+<div class="screen" id="screen-2">
+  <div class="section-wrap">
+    <div class="section-tag">STEP 2</div>
+    <div class="section-title">Quanti giorni ti alleni?</div>
+    <div class="section-sub">Seleziona il numero di sessioni settimanali</div>
+  </div>
+  <div class="day-grid">
+    <div class="day-btn" onclick="selGiorni(1)"><div class="num">1</div><div class="label">GIORNO</div></div>
+    <div class="day-btn" onclick="selGiorni(2)"><div class="num">2</div><div class="label">GIORNI</div></div>
+    <div class="day-btn" onclick="selGiorni(3)"><div class="num">3</div><div class="label">GIORNI</div></div>
+    <div class="day-btn" onclick="selGiorni(4)"><div class="num">4</div><div class="label">GIORNI</div></div>
+    <div class="day-btn" onclick="selGiorni(5)"><div class="num">5</div><div class="label">GIORNI</div></div>
+    <div class="day-btn" onclick="selGiorni(6)"><div class="num">6</div><div class="label">GIORNI</div></div>
+  </div>
+</div>
+
+<!-- STEP 3 -->
+<div class="screen" id="screen-3">
+  <div class="section-wrap">
+    <div class="section-tag">STEP 3</div>
+    <div class="section-title">Muscoli per giorno</div>
+    <div class="section-sub">Seleziona i gruppi per ogni sessione</div>
+  </div>
+  <div class="giorno-tabs" id="musc-tabs"></div>
+  <div style="padding:16px 20px 0" id="musc-panel"></div>
+</div>
+
+<!-- STEP 4 -->
+<div class="screen" id="screen-4">
+  <div class="section-wrap">
+    <div class="section-tag">STEP 4</div>
+    <div class="section-title">Esercizi</div>
+    <div class="section-sub">Costruisci la tua routine giorno per giorno</div>
+  </div>
+  <div class="giorno-tabs" id="es-tabs"></div>
+  <div id="es-panel" style="padding-top:16px"></div>
+</div>
+
+<!-- STEP 5 -->
+<div class="screen" id="screen-5">
+  <div class="section-wrap">
+    <div class="section-tag">STEP 5</div>
+    <div class="section-title">Riepilogo Scheda</div>
+    <div class="section-sub">Controlla prima di inviare</div>
+  </div>
+  <div id="summary" style="margin-top:16px"></div>
+</div>
+
+<!-- STEP 6 -->
+<div class="screen" id="screen-6">
+  <div class="section-wrap">
+    <div class="section-tag">STEP 6</div>
+    <div class="section-title">Invia al dispositivo</div>
+    <div class="section-sub">Connetti GymOS via Bluetooth</div>
+  </div>
+  <div class="ble-big">
+    <div class="ble-icon" id="ble-icon">📡</div>
+    <div class="ble-label" id="ble-label">NON CONNESSO</div>
+    <button class="btn btn-gold" id="btn-conn" onclick="bleConnect()" style="width:100%;max-width:280px">Connetti a GymOS</button>
+    <button class="btn btn-ghost btn-sm" id="btn-disc" onclick="bleDisconnect()" style="display:none">Disconnetti</button>
+  </div>
+  <div style="padding:0 20px 12px">
+    <div class="prog-outer" id="prog-outer"><div class="prog-inner" id="prog-inner"></div></div>
+    <button class="btn btn-green" id="btn-send" onclick="bleInviaScheda()" disabled style="width:100%;margin-top:10px">📤 Invia Scheda</button>
+  </div>
+  <div style="padding:0 20px;margin-bottom:8px;font-size:.7rem;letter-spacing:1.5px;color:var(--muted)">LOG</div>
+  <div class="ble-log" id="ble-log"><span class="info">In attesa di connessione...</span></div>
+  <div style="padding:0 20px;margin-top:16px;display:flex;gap:10px">
+    <button class="btn btn-gray" style="flex:1" onclick="scaricaJSON()">💾 Salva JSON</button>
+    <label class="btn btn-gray" style="flex:1;cursor:pointer">📂 Carica JSON<input type="file" accept=".json" style="display:none" onchange="caricaJSON(event)"></label>
+  </div>
+</div>
+
+</main>
+<div class="bottom-bar">
+  <button class="btn btn-ghost btn-back" id="btn-back" onclick="stepBack()" style="width:52px">←</button>
+  <button class="btn btn-gold btn-next" id="btn-next" onclick="stepNext()">Avanti →</button>
+</div>
+
+<script>
+// ══════════════════════════════════════════════════
+// DATABASE
+// ══════════════════════════════════════════════════
+const DB = {
+  Pettorali:["Croce ai cavi alti e bassi per il petto","Distensione con bilanciere su pavimento","Distensione dei pettorali bassi al cavo in piedi","Distensione su panca inclinata con bilanciere","Superman push-up","Korean dip","Panca inclinata con cavi bassi","Distensione dei pettorali al cavo in piedi","Knuckle push-up","Cavo inginocchiato croce alta-bassa","Croce ai cavi con un braccio","Jack push-up","Planche dips","Deep push up on parallel bars","Low incline dumbbell fly","One-arm push-up","Straight bar dips","Scapula push-up","One-arm low fly dumbbell","Close grip dumbbell press","Cable middle chest fly","Svend press","Floor dumbbell press","Decline push-up","Smith bench press","Dumbbell larsen press","Negative push-up","Incline dumbbell bench press","Dumbbell floor chest fly","Barbell pullover","Pec deck chest fly","Hammer grip dumbbell bench press","Dumbbell poliquin press","Decline barbell bench press","Push-up","Seated cable fly","Incline neutral grip dumbbell press","Decline cable chest press","Suspension chest fly","Spoto press","One-arm dumbbell incline bench press","Barbell larsen press","Incline dumbbell chest fly","Machine chest press","Decline chest press","Lying cable fly","Clap push-up","Standing incline band chest fly","One-arm high-to-low cable fly","Archer push-up","Dumbbell bench press","Incline hammer chest press","Chest dips","Kettlebell one arm floor press","Shoulder tap","Seated cable chest press","Ring push-up","One-arm dumbbell bench press","Decline dumbbell bench press","Wide hand push-up","Push-up on parallel bars","One-arm low-to-high cable fly","Decline smith bench press","Machine chest fly","Barbell bench press","Dumbbell low to high fly","Decline dumbbell fly","Smith incline chest press","Incline push-up","Cable bench press","Weighted push-up","Dumbbell chest fly","Dumbbell deep push up","Croci ai cavi su panca inclinata","Panca Piana"],
+  Schiena:["One-arm lat pulldown","Pull-up","Weighted pull-up","One-arm dumbbell bent over scapula row","Close grip pull up","Barbell bent over row","One-arm cable low row","Seated cable wide grip row","Seated cable row","Rope straight-arm lat pulldown","Cable wide grip behind neck pulldown","Wide grip rear pull-up","Chin-up","Pull-up wide grip","Suspension row","One-arm straight-arm cable lat pulldown","Cable neutral grip lat pulldown","One-arm low cable seated row","Front lever pull-up","Cable lat pulldown","Bent over kettlebell row","Machine shrugs","Wide grip chest supported row","Gorilla row","Suspension inverted row","T-bar bent over row","Incline bench dumbbell wide row","Dumbbell bent over row","Machine pullover","Wide grip lat pulldown","Dumbbell seal row","Dumbbell shoulder shrugs","Seated dumbbell shrugs","One-arm landmine bent over row","One-arm cable half-kneeling lat pulldown","Australian pull-up underhand grip","Lever low row","Pull-up neutral grip","Alternate renegade row","One-arm high row cable","Cable close grip lat pulldown","Barbell shoulder shrug","Cable reverse grip pulldown","Incline chest supported barbell row","Assisted pull-up","Barbell rear delt row","Cable seated row neutral grip","One-arm cable row","Lever high row","Inverted row","Pendlay row","Lever back extension","Dumbbell lat pullover","Kneeling cable lat pulldown","Close grip landmine row","One-arm seated row","Barbell incline wide grip row","Seal row","Double dumbbell bent over row","Lat-machine","Curl cavi bassi"],
+  Spalle:["Dumbbell push press","Dumbbell front raise","Cable front raise","One-arm cable lateral raise","Dumbbell seated lateral raise","Barbell push press","Seated cuban press","One-arm shoulder press dumbbell","One-arm cable front raise","Bent over dumbbell lateral raise","Barbell overhead press","Pike push-up between benches","Cable upright row","Lateral to front raise","Cable supinated face pull","Dumbbell cuban rotation","Seated face pull","Standing dumbbell shoulder press","Lying cable face pull","Cable face pull","Barbell wide grip upright row","Seated dumbbell shoulder press","Machine reverse flyes","Dumbbell half kneeling shoulder press","Barbell narrow grip upright row","Machine shoulder press","Dumbbell upright row","Kettlebell clean and jerk","Dumbbell alternate hammer front raise","Seated shoulder external rotation","Plate bus driver","Pike push-up","Ring face pull","Incline powell raise","Standing cuban press","One-arm rear delt fly","Cable rear delt fly","Barbell front raise","Seated arnold dumbbell press","Dumbbell standing alternate press","Landmine lateral raise","Banded face pull","Handstand push-up","Cable lateral raise","Dumbbell lateral raise","Dumbbell lu raises","Cable seated rear lateral raise","Cable leaning lateral raise","One-arm dumbbell lateral raise","Dumbbell snatch","Smith machine upright row","Landmine press","Dumbbell alternate front raise","Powell raise","One-arm cable rear delt fly","Machine lateral raise","Dumbbell rear delt row","Smith shoulder press","Alzate laterali"],
+  Gambe:["Sliding leg curl","Anderson squat","Pistol squat","Weighted sissy squat","Narrow stance 45 degree leg press","Barbell calf raise","Weighted seated calf raise","Smith chair squat","Seated hip adduction","Barbell squat","Deficit deadlift","Deadlift","Barbell step-up","Single-leg calf raise with dumbbell","Lowbar squat","High-bar squat","Box step-up","Dumbbell split squat","Barbell sumo squat","Split squat front foot elevated","Leg press wide stance","Seated leg curl","Nordic hamstring curl","Seated calf raise","Dumbbell squat","Standing leg curl","Terminal knee extension","Bulgarian squat smith","Single leg press","Front squat","Smith squat","Poliquin step-up","One-arm kettlebell swing","Single-leg deadlift","Single-leg calf raise","Barbell walking lunges","Box jumps","Smith hack squat","Walking lunges","Barbell hack squat","Smith split squat","Squat","Dumbbell cossack squat","Dumbbell walking lunges","Barbell rack pull","Barbell straight leg deadlift","Standing calf raise","Goblet squat","Side lunges","Barbell split squat","Split squat","Kettlebell rear lunge","Dumbbell goblet squat","Dumbbell straight leg deadlift","Weighted cossack squat","Barbell reverse lunges","Machine hack squat","Sumo squat","Seated leg extension machine","Kettlebell deadlift","Landmine squat","Kettlebell swing","Machine reverse hack squat","Assisted pistol squat","Dumbbell step-up","Rear lunge","Dumbbell romanian deadlift","Dumbbell lunges","Lunges","Dumbbell deadlift","Cable romanian deadlift","Leg press","Cyclist squat","B stance romanian deadlift","Trap bar deadlift","Squat con bilanciere"],
+  Glutei:["Dumbbell single leg hip thrust","Kneeling resistance band glute kickback","Dumbbell reverse lunge off step","Cable hip abducction","Barbell good morning","Mini band glute bridge","Smith machine good morning","Donkey kick","Split squat front foot elevated","Hip thrust smith machine","Single leg romanian deadlift","Weighted back extension","Band standing balance glute kickback","Hip thrust","Side plank hip abduction","Glute bridge","Glute cable kickback","Weighted glute bridge","Side lying hip abduction","Barbell glute bridge","Sumo deadlift","Standing hip abduction","Back extension","Dumbbell rear lunge","Cable pull through","Glute machine kickback","Kas glute bridge","Dumbbell sumo squat","Glute bridge on bench","Single leg weighted glute bridge","Hip hinge","Back extension with dumbbell","Romanian deadlift","Seated hip abduction","Band hip abduction","Lateral monster walk","Frog pump","Bulgarian squat","Machine hip thrust","Side plank clamshell","Deadlift from blocks","Seated good morning","Bird dog","Dumbbell hip thrust","Glute bridge single leg"],
+  Bicipiti:["Band biceps curl","Zottman curl","Close-grip ez bar curl","Bayesian cable curl","Bar cable biceps curl","Dumbbell spider curl","Seated dumbbell curl","Spider hammer curl","Single dumbbell curl","Dumbbell supinated preacher curl","One-arm machine preacher curl","Ez-bar preacher curl","Double dumbbell preacher curl","Dumbbell incline hammer curl","Cable squatting curl","One-arm cable biceps curl","Ez-bar biceps curl","Barbell prone incline curl","Dumbbell hammer curl","Biceps barbell curl","Dumbbell alternate supinated curl","Seated hammer curl","One-arm preacher hammer curl","Wide grip standing barbell curl","Dumbbell drag curl","Dumbbell biceps curl","Dumbbell incline alternate supinated curl","Machine biceps curl","Hercules curl","Barbell preacher curl","Ez-bar spider curl","Incline cable curl","Dumbbell cross body hammer curl","Close grip biceps curl","One-arm hammer cable curl","Barbell drag curl","Concentration hammer curl","Dumbbell concentration curl","Alternate dumbbell hammer curl","Seated incline biceps curl","One-arm dumbbell preacher curl","Rope cable hammer curl","Machine preacher curl","Cable preacher curl","Alternate biceps curl"],
+  Tricipiti:["Diamond push-up","Weighted dips","Cable incline skull crusher","Triceps cable pushdown reverse grip","Jm press","Standing one dumbbell french press","Lying ez-bar triceps extension","Close grip smith bench press","Ez-bar seated triceps extension","Tate press","Weighted bench dips","Close grip incline dumbbell bench press","One-arm katana triceps overhead extension","Lying barbell triceps extension","Ring triceps extension","One-arm cable cross body triceps extension","Close grip push-up","Dips","Triceps push-up","One-arm reverse grip triceps cable pushdown","One-arm triceps cable pushdown","High pulley overhead triceps extension","Cable overhead triceps extension","One-arm dumbbell seated kickback","Ez-bar tricep pushdown","Seated triceps bench dip","Ring dips","Dumbbell lying triceps extension","Suspension triceps extension","Dumbbell seated triceps extension","Machine triceps extension","Triceps pushdown v-bar","Overhead cable triceps extension","Cable triceps pushdown","Standing overhead barbell triceps extension","Underhand triceps extension","Katana triceps extension","Decline barbell french press","Triceps cable kickback","Incline barbell triceps extension","Decline diamond push-up","Seated cable horizontal french press","Incline dumbbell triceps extension","Cable double-arm tricep kickback","Band triceps pushdown","One-arm overhead triceps extension","Rope triceps pushdown"],
+  Avambracci:["Dumbbell lying pronation","One-arm neutral wrist dumbbell curl","One-arm wrist curl dumbbell","Ez-bar seated reverse wrist curl","One-arm dumbbell supination","Farmer walk","Barbell standing wrist curl","Dumbbell standing wrist curl","Wrist push-up","Barbell standing back wrist curl","Wrist roller","Ez-bar seated wrist curl","Barbell reverse grip forearm curl","Unilateral farmer walk","Ez-bar reverse spider curl","Dumbbell farmer carry","Ez-bar reverse grip biceps curl","Dumbbell standing reverse wrist curls","Dead hang","Barbell reverse wrist curl","Reverse grip cable curl","Dumbbell biceps reverse curl","Cable wrist curl","Seated cable wrist curl","Barbell wrist curl","Hand gripper","One-arm dumbbell reverse wrist curl","Cable standing wrist roll"],
+  Addominali:["Knee tuck crunch","Leg in and out","Weighted decline crunch","Hanging scissors kicks","Ab wheel rollout","Abdominal crunches","Hollow body hold","Weighted straight arm crunch","Straight leg raise on dip bars","Hanging knee to chest","Incline bench leg raises","Dragon flag","Weighted sit up","Dead bug","Med ball russian twist","Bicycle crunches","Scissors","Hanging knees to elbows","Stability ball crunch","Sit up","Lying stright leg raise","Plank","Hanging knees to elbows waist","V-up","V-sit crunch","Toes to bar","Weighted plank","Air bike","Mountain climber","Hanging knee circles","Hanging leg raise to bar","Hanging straight leg raise","Weighted hollow body hold","Seated leg raise","Side crunch","Suspension v-ups","Reverse crunches","Dumbbell russian twist","Weighted russian twist","Seated flutter kick","Side plank","Swiss ball plank","Saw plank","Standing cable ab crunch","Barbell rollout - kneeling","Bear plank","Janda sit up","Seated ab cable crunch","Weighted hanging leg raise","Weighted ab crunches","Landmine twist","Hanging oblique knee raise","Ankle taps","Hanging knee raises","Decline crunch","Captains chair knee raises","Elbow plank","Full plank","Elbow plank, Full plank, Side plank"]
+};
+const ALL_ES=[];
+Object.entries(DB).forEach(([g,l])=>l.forEach(n=>ALL_ES.push({nome:n,gruppo:g})));
+
+function gifPath(nome,gruppo){
+  return '/gifs/'+gruppo+'/'+nome.toLowerCase().replace(/ /g,'_').replace(/[^a-z0-9_]/g,'')+'.gif';
+}
+
+// ══════════════════════════════════════════════════
+// STATO
+// ══════════════════════════════════════════════════
+let step=1,STEPS=6;
+let scheda={nome_utente:'USER',giorni:[]};
+let numG=0, muscG=[], tabMusc=0, tabEs=0, esState=[];
+
+// ══════════════════════════════════════════════════
+// NAV
+// ══════════════════════════════════════════════════
+function upd(){
+  const ind=document.getElementById('steps-ind');
+  ind.innerHTML='';
+  for(let i=1;i<=STEPS;i++){
+    const d=document.createElement('div');
+    d.className='step-dot'+(i===step?' active':i<step?' done':'');
+    ind.appendChild(d);
+  }
+  document.getElementById('btn-back').style.visibility=step===1?'hidden':'visible';
+  const bn=document.getElementById('btn-next');
+  if(step===6){bn.style.display='none';}
+  else{bn.style.display='';bn.textContent=step===5?'📡 Invia →':'Avanti →';}
+}
+
+function show(n){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById('screen-'+n).classList.add('active');
+  document.getElementById('ms').scrollTop=0;
+}
+
+function stepNext(){
+  if(step===1){
+    const n=document.getElementById('input-nome').value.trim();
+    if(!n){document.getElementById('input-nome').focus();return;}
+    scheda.nome_utente=n;
+  }
+  if(step===2&&numG===0)return;
+  if(step===3){}
+  if(step===4)buildJSON_internal();
+  if(step===5){step=6;show(6);upd();return;}
+  step++;
+  if(step===3)initMusc();
+  if(step===4)initEs();
+  if(step===5)renderSummary();
+  show(step);upd();
+}
+function stepBack(){if(step<=1)return;step--;show(step);upd();}
+
+// ══════════════════════════════════════════════════
+// STEP 2
+// ══════════════════════════════════════════════════
+function selGiorni(n){
+  numG=n;
+  document.querySelectorAll('.day-btn').forEach((b,i)=>b.classList.toggle('selected',i+1===n));
+}
+
+// ══════════════════════════════════════════════════
+// STEP 3 — MUSCOLI
+// ══════════════════════════════════════════════════
+const MUSC=['Pettorali','Schiena','Spalle','Gambe','Glutei','Bicipiti','Tricipiti','Avambracci','Addominali'];
+
+function initMusc(){
+  if(muscG.length!==numG)muscG=Array.from({length:numG},()=>[]);
+  tabMusc=0;renderMuscTabs();renderMuscPanel();
+}
+function renderMuscTabs(){
+  const t=document.getElementById('musc-tabs');t.innerHTML='';
+  for(let i=0;i<numG;i++){
+    const d=document.createElement('div');
+    d.className='gtab'+(i===tabMusc?' active':'');
+    d.textContent='G'+(i+1);
+    d.onclick=(()=>{const idx=i;return()=>{tabMusc=idx;renderMuscTabs();renderMuscPanel();};})();
+    t.appendChild(d);
+  }
+}
+function renderMuscPanel(){
+  const sel=muscG[tabMusc]||[];
+  document.getElementById('musc-panel').innerHTML=`
+    <div style="font-size:.8rem;color:var(--muted2);margin-bottom:14px">
+      Gruppi muscolari per <strong style="color:var(--text)">Giorno ${tabMusc+1}</strong>
+    </div>
+    <div class="muscoli-grid">
+      ${MUSC.map(m=>`<div class="muscolo-chip ${sel.includes(m)?'selected':''}" onclick="togMusc('${m}')">${m}${sel.includes(m)?' ✓':''}</div>`).join('')}
+    </div>`;
+}
+function togMusc(m){
+  const s=muscG[tabMusc],i=s.indexOf(m);
+  if(i>=0)s.splice(i,1);else s.push(m);
+  renderMuscPanel();
+}
+
+// ══════════════════════════════════════════════════
+// STEP 4 — ESERCIZI
+// ══════════════════════════════════════════════════
+function initEs(){
+  if(esState.length!==numG)esState=Array.from({length:numG},()=>[]);
+  tabEs=0;renderEsTabs();renderEsPanel();
+}
+function renderEsTabs(){
+  const t=document.getElementById('es-tabs');t.innerHTML='';
+  for(let i=0;i<numG;i++){
+    const ms=(muscG[i]||[]).map(m=>m.substring(0,3).toUpperCase()).join('+');
+    const d=document.createElement('div');
+    d.className='gtab'+(i===tabEs?' active':'');
+    d.innerHTML=`G${i+1} <span style="font-size:.65rem;opacity:.6">${ms||'—'}</span>`;
+    d.onclick=(()=>{const idx=i;return()=>{tabEs=idx;renderEsTabs();renderEsPanel();};})();
+    t.appendChild(d);
+  }
+}
+function renderEsPanel(){
+  const panel=document.getElementById('es-panel');
+  const list=esState[tabEs]||[];
+  let h='<div class="es-wrap">';
+  list.forEach((es,i)=>{h+=buildEsCard(tabEs,i,es);});
+  h+=`</div><div class="add-btn-wrap"><button class="btn btn-gray btn-sm" style="width:100%" onclick="addEs(${tabEs})">+ Aggiungi Esercizio</button></div>`;
+  panel.innerHTML=h;
+}
+function buildEsCard(g,i,es){
+  const circ=es.tipo==='circuito';
+  const isOpen=es._open===true||(i===esState[g].length-1&&es._open!==false);
+  const muscoli=muscG[g]||[];
+  const pool=muscoli.length>0?ALL_ES.filter(e=>muscoli.includes(e.gruppo)):ALL_ES;
+  return `<div class="es-card ${isOpen?'open':''}" id="ec-${g}-${i}">
+    <div class="es-card-header" onclick="togEs(${g},${i})">
+      <span class="es-num">ES.${i+1}</span>
+      <span class="es-name-preview">${es.nome||'Nuovo esercizio'}</span>
+      <span class="es-tipo-pill ${circ?'pill-circuito':'pill-normale'}">${circ?'CIRC':'NORM'}</span>
+      <button class="btn btn-red btn-sm" style="padding:4px 8px" onclick="event.stopPropagation();delEs(${g},${i})">✕</button>
+    </div>
+    <div class="es-card-body">
+      <div class="field">
+        <label>Cerca Esercizio</label>
+        <div class="search-wrap">
+          <span class="search-icon">🔍</span>
+          <input class="search-input" type="text" placeholder="${es.nome||'digita per cercare...'}"
+            id="si-${g}-${i}" oninput="cercaEs(${g},${i},this.value)" onfocus="openSearch(${g},${i})" autocomplete="off">
+        </div>
+        <div class="search-results" id="sr-${g}-${i}"></div>
+      </div>
+      <div class="field">
+        <label>Tipo</label>
+        <div class="tipo-toggle">
+          <div class="tipo-opt ${!circ?'active-normale':''}" onclick="setTipo(${g},${i},'normale')">Normale</div>
+          <div class="tipo-opt ${circ?'active-circuito':''}" onclick="setTipo(${g},${i},'circuito')">Circuito</div>
+        </div>
+      </div>
+      <div class="row-fields-3">
+        <div class="field"><label>Serie</label>
+          <input type="number" min="1" max="20" value="${es.serie||4}" oninput="setF(${g},${i},'serie',parseInt(this.value)||4)">
+        </div>
+        <div class="field"><label>Rep</label>
+          <input type="text" value="${es.reps||'12'}" placeholder="12 / 10,8,6" oninput="setF(${g},${i},'reps',this.value)">
+        </div>
+        <div class="field"><label>Rec (sec)</label>
+          <input type="number" min="0" max="600" value="${es.recupero_sec||90}" oninput="setF(${g},${i},'recupero_sec',parseInt(this.value)||60)">
+        </div>
+      </div>
+      ${circ?`<div class="field"><label>Tempo Lavoro (sec)</label>
+        <input type="number" min="1" max="300" value="${es.tempo_lavoro_sec||30}" oninput="setF(${g},${i},'tempo_lavoro_sec',parseInt(this.value)||30)">
+      </div>`:''}
+      <div class="field"><label>Note (opzionale)</label>
+        <textarea placeholder="Indicazioni tecniche, peso..." oninput="setF(${g},${i},'note',this.value)">${es.note||''}</textarea>
+      </div>
+    </div>
+  </div>`;
+}
+function togEs(g,i){
+  const c=document.getElementById(`ec-${g}-${i}`);
+  esState[g][i]._open=!c.classList.contains('open');
+  c.classList.toggle('open');
+}
+function addEs(g){
+  esState[g].forEach(e=>e._open=false);
+  esState[g].push({nome:'',tipo:'normale',serie:4,reps:'12',recupero_sec:90,tempo_lavoro_sec:30,note:'',gif_file:'',_open:true});
+  renderEsPanel();
+}
+function delEs(g,i){esState[g].splice(i,1);renderEsPanel();}
+function setF(g,i,f,v){esState[g][i][f]=v;}
+function setTipo(g,i,t){esState[g][i].tipo=t;renderEsPanel();}
+
+function openSearch(g,i){
+  const muscoli=muscG[g]||[];
+  const pool=muscoli.length>0?ALL_ES.filter(e=>muscoli.includes(e.gruppo)).slice(0,20):ALL_ES.slice(0,20);
+  const sr=document.getElementById(`sr-${g}-${i}`);
+  sr.innerHTML=pool.map(e=>`<div class="search-item" onclick="selEs(${g},${i},'${e.nome.replace(/\\/g,'\\\\').replace(/'/g,"\\'")}','${e.gruppo}')"><span>${e.nome}</span><span class="es-gruppo">${e.gruppo.toUpperCase()}</span></div>`).join('');
+  sr.classList.add('open');
+}
+function cercaEs(g,i,q){
+  const sr=document.getElementById(`sr-${g}-${i}`);
+  if(!q||q.length<2){sr.classList.remove('open');return;}
+  const muscoli=muscG[g]||[];
+  const pool=muscoli.length>0?ALL_ES.filter(e=>muscoli.includes(e.gruppo)):ALL_ES;
+  const ql=q.toLowerCase();
+  const m=pool.filter(e=>e.nome.toLowerCase().includes(ql)).slice(0,12);
+  if(!m.length){sr.classList.remove('open');return;}
+  sr.innerHTML=m.map(e=>`<div class="search-item" onclick="selEs(${g},${i},'${e.nome.replace(/\\/g,'\\\\').replace(/'/g,"\\'")}','${e.gruppo}')"><span>${e.nome}</span><span class="es-gruppo">${e.gruppo.toUpperCase()}</span></div>`).join('');
+  sr.classList.add('open');
+}
+function selEs(g,i,nome,gruppo){
+  esState[g][i].nome=nome;
+  esState[g][i].gif_file=gifPath(nome,gruppo);
+  document.getElementById(`sr-${g}-${i}`)?.classList.remove('open');
+  document.getElementById(`si-${g}-${i}`).value='';
+  renderEsPanel();
+}
+document.addEventListener('click',e=>{
+  if(!e.target.closest('.search-wrap')&&!e.target.closest('.search-results'))
+    document.querySelectorAll('.search-results').forEach(r=>r.classList.remove('open'));
+});
+
+// ══════════════════════════════════════════════════
+// BUILD JSON
+// ══════════════════════════════════════════════════
+function buildJSON_internal(){
+  scheda.giorni=[];
+  for(let i=0;i<numG;i++){
+    const ms=muscG[i]||[];
+    const titolo=ms.map(m=>m.toUpperCase()).join(' & ')||`GIORNO ${i+1}`;
+    const esercizi=(esState[i]||[]).map(es=>{
+      const o={tipo:es.tipo||'normale',nome:es.nome||'ESERCIZIO',serie:es.serie||4,reps:es.reps||'12',recupero_sec:es.recupero_sec||90,gif_file:es.gif_file||''};
+      if(es.tipo==='circuito')o.tempo_lavoro_sec=es.tempo_lavoro_sec||30;
+      if(es.note)o.note=es.note;
+      if(!o.gif_file)delete o.gif_file;
+      return o;
+    });
+    scheda.giorni.push({id_giorno:i+1,titolo,esercizi});
+  }
+}
+
+// ══════════════════════════════════════════════════
+// STEP 5 — RIEPILOGO
+// ══════════════════════════════════════════════════
+function renderSummary(){
+  buildJSON_internal();
+  let h=`<div class="summary-card" style="display:flex;align-items:center;gap:14px">
+    <div style="font-size:2rem">👤</div>
+    <div><div style="font-family:'Bebas Neue',sans-serif;font-size:1.3rem;letter-spacing:2px">${scheda.nome_utente}</div>
+    <div style="font-size:.8rem;color:var(--muted2)">${numG} giorni di allenamento</div></div></div>`;
+  scheda.giorni.forEach((g,i)=>{
+    h+=`<div class="summary-card"><div class="summary-day-title">G${i+1} — ${g.titolo}</div>`;
+    if(!g.esercizi.length)h+=`<div style="font-size:.8rem;color:var(--muted)">Nessun esercizio</div>`;
+    else g.esercizi.forEach(es=>{
+      h+=`<div class="summary-es"><div class="${es.tipo==='circuito'?'dot-g':'dot-v'}"></div>
+      <span>${es.nome}</span><span style="margin-left:auto;font-size:.75rem;color:var(--muted)">${es.serie}×${es.reps}</span></div>`;
+    });
+    h+=`</div>`;
+  });
+  document.getElementById('summary').innerHTML=h;
+}
+
+// ══════════════════════════════════════════════════
+// BLE
+// ══════════════════════════════════════════════════
+const SVC='12345678-1234-1234-1234-123456789abc';
+const RXC='12345678-1234-1234-1234-123456789abd';
+const STC='12345678-1234-1234-1234-123456789abe';
+const CSZ=200;
+let bDev=null,bRx=null,bSt=null,bConn=false;
+
+function bLog(m,t=''){
+  const l=document.getElementById('ble-log');
+  const d=document.createElement('div');d.className=t;
+  d.textContent=`[${new Date().toLocaleTimeString()}] ${m}`;
+  l.appendChild(d);l.scrollTop=l.scrollHeight;
+}
+async function bleConnect(){
+  if(!navigator.bluetooth){bLog('Web Bluetooth non disponibile. Usa Chrome su Android.','err');return;}
+  try{
+    bLog('Ricerca GymOS...','info');
+    bDev=await navigator.bluetooth.requestDevice({filters:[{name:'GymOS'}],optionalServices:[SVC]});
+    bDev.addEventListener('gattserverdisconnected',onDisc);
+    const srv=await bDev.gatt.connect();
+    const svc=await srv.getPrimaryService(SVC);
+    bRx=await svc.getCharacteristic(RXC);
+    bSt=await svc.getCharacteristic(STC);
+    await bSt.startNotifications();
+    bSt.addEventListener('characteristicvaluechanged',e=>{
+      const v=new TextDecoder().decode(e.target.value);
+      bLog('ESP32 → '+v,v==='OK'?'ok':v==='ERR'?'err':'info');
+    });
+    bConn=true;
+    document.getElementById('ble-icon').textContent='🟢';
+    document.getElementById('ble-label').textContent='CONNESSO A '+bDev.name;
+    document.getElementById('btn-conn').style.display='none';
+    document.getElementById('btn-disc').style.display='block';
+    document.getElementById('btn-send').disabled=false;
+    bLog('Connesso a '+bDev.name,'ok');
+  }catch(e){bLog('Errore: '+e.message,'err');}
+}
+function onDisc(){
+  bConn=false;bRx=null;bSt=null;
+  document.getElementById('ble-icon').textContent='📡';
+  document.getElementById('ble-label').textContent='DISCONNESSO';
+  document.getElementById('btn-conn').style.display='block';
+  document.getElementById('btn-disc').style.display='none';
+  document.getElementById('btn-send').disabled=true;
+  bLog('Dispositivo disconnesso.','err');
+}
+function bleDisconnect(){if(bDev?.gatt.connected)bDev.gatt.disconnect();}
+
+async function bleInviaScheda(){
+  if(!bConn||!bRx){bLog('Non connesso!','err');return;}
+  buildJSON_internal();
+  const bytes=new TextEncoder().encode(JSON.stringify(scheda));
+  const n=Math.ceil(bytes.length/CSZ);
+  bLog(`Invio ${bytes.length} byte in ${n} chunk...`,'info');
+  const po=document.getElementById('prog-outer'),pi=document.getElementById('prog-inner');
+  po.classList.add('show');pi.style.width='0%';
+  try{
+    await bRx.writeValueWithResponse(new TextEncoder().encode('BEGIN'));
+    bLog('BEGIN inviato','info');await sleep(100);
+    for(let i=0;i<n;i++){
+      await bRx.writeValueWithResponse(bytes.slice(i*CSZ,(i+1)*CSZ));
+      const p=Math.round(((i+1)/n)*100);
+      pi.style.width=p+'%';
+      bLog(`Chunk ${i+1}/${n} (${p}%)`,'');
+      await sleep(50);
+    }
+    await bRx.writeValueWithResponse(new TextEncoder().encode('END'));
+    bLog('END inviato — attendo conferma...','info');
+    setTimeout(()=>po.classList.remove('show'),3000);
+  }catch(e){bLog('Errore: '+e.message,'err');po.classList.remove('show');}
+}
+function sleep(ms){return new Promise(r=>setTimeout(r,ms));}
+
+function scaricaJSON(){
+  buildJSON_internal();
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([JSON.stringify(scheda,null,2)],{type:'application/json'}));
+  a.download='workout.json';a.click();
+}
+function caricaJSON(e){
+  const f=e.target.files[0];if(!f)return;
+  const r=new FileReader();
+  r.onload=ev=>{try{scheda=JSON.parse(ev.target.result);bLog('JSON caricato: '+scheda.nome_utente+', '+scheda.giorni.length+' giorni','ok');}catch{bLog('JSON non valido!','err');}};
+  r.readAsText(f);
+}
+
+// INIT
+upd();
+if(!navigator.bluetooth)setTimeout(()=>bLog('⚠️ Web Bluetooth non supportato. Usa Chrome su Android.','err'),500);
+</script>
+</body>
+</html>
