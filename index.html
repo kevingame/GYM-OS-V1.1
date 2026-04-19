@@ -145,9 +145,7 @@ main::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
           Carica JSON
           <input type="file" accept=".json" style="display:none" onchange="caricaJSONStep1(event)">
         </label>
-        <button class="btn btn-gray btn-sm" style="padding:4px 6px" onclick="event.stopPropagation();moveEs(${g},${i},-1)" ${i===0?'disabled':''}>↑</button>
-        <button class="btn btn-gray btn-sm" style="padding:4px 6px" onclick="event.stopPropagation();moveEs(${g},${i},+1)" ${i===esState[g].length-1?'disabled':''}>↓</button>
-        <button class="btn btn-red btn-sm" style="padding:4px 8px" onclick="event.stopPropagation();delEs(${g},${i})">✕</button>
+        <button class="btn btn-red btn-sm" id="btn-clear-json" style="display:none" onclick="clearJSON()">✕ Rimuovi</button>
       </div>
     </div>
   </div>
@@ -467,6 +465,8 @@ function buildEsCard(g,i,es){
       <span class="es-num">ES.${i+1}</span>
       <span class="es-name-preview">${preview}</span>
       <span class="es-tipo-pill ${circ?'pill-circuito':'pill-normale'}">${circ?'CIRC':'NORM'}</span>
+      <button class="btn btn-gray btn-sm" style="padding:4px 6px" onclick="event.stopPropagation();moveEs(${g},${i},-1)" ${i===0?'disabled':''}>↑</button>
+      <button class="btn btn-gray btn-sm" style="padding:4px 6px" onclick="event.stopPropagation();moveEs(${g},${i},+1)" ${i===esState[g].length-1?'disabled':''}>↓</button>
       <button class="btn btn-red btn-sm" style="padding:4px 8px" onclick="event.stopPropagation();delEs(${g},${i})">✕</button>
     </div>
     <div class="es-card-body">
