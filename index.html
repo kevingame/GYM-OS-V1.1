@@ -136,7 +136,7 @@ main::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
       <div style="display:flex;gap:8px">
         <label class="btn btn-gray btn-sm" style="flex:1;cursor:pointer">
           Carica JSON
-          <input type="file" accept=".json" style="display:none" onchange="caricaJSONStep1(event)">
+          <input type="file" accept=".json,application/json" style="display:none" onchange="caricaJSONStep1(event)">
         </label>
         <button class="btn btn-red btn-sm" id="btn-clear-json" style="display:none" onclick="clearJSON()">✕ Rimuovi</button>
       </div>
@@ -215,7 +215,7 @@ main::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
   <div class="ble-log" id="ble-log"><span class="info">In attesa di connessione...</span></div>
   <div style="padding:0 20px;margin-top:16px;display:flex;gap:10px">
     <button class="btn btn-gray" style="flex:1" onclick="scaricaJSON()">💾 Salva JSON</button>
-    <label class="btn btn-gray" style="flex:1;cursor:pointer">📂 Carica JSON<input type="file" accept=".json" style="display:none" onchange="caricaJSON(event)"></label>
+    <label class="btn btn-gray" style="flex:1;cursor:pointer">📂 Carica JSON<input type="file" accept=".json,application/json" style="display:none" onchange="caricaJSON(event)"></label>
   </div>
 </div>
  
@@ -511,6 +511,9 @@ function caricaJSONStep1(ev) {
           nomi_circuito: es.tipo === 'circuito'
             ? (es.nome || '').split(',').map(n => n.trim()).filter(Boolean)
             : [],
+          nomi_normali: es.tipo !== 'circuito'
+            ? (es.nome || '').split(',').map(n => n.trim()).filter(Boolean)
+            : [],
           _open: false
         }))
       );
@@ -653,28 +656,36 @@ function buildEsCard(g, i, es) {
   const circ = es.tipo === 'circuito';
   const total = esState[g].length;
   const isOpen = es._open === true || (i === total - 1 && es._open !== false);
-  const preview = circ && es.nomi_circuito && es.nomi_circuito.length
-    ? es.nomi_circuito.join(', ')
+
+  // Preview: usa lista tag (sia normale che circuito)
+  const tagList = circ ? (es.nomi_circuito||[]) : (es.nomi_normali||[]);
+  const preview = tagList.length
+    ? tagList.join(', ')
     : (es.nome || 'Nuovo esercizio');
- 
-  const tagsHtml = circ ? `
+
+  // Tag HTML per ENTRAMBI i tipi
+  const tagColor = circ ? 'circ' : 'norm';
+  const tagStyle = circ
+    ? 'background:#1f1400;border:1px solid #3a2a00;border-radius:6px;padding:4px 10px;font-size:.78rem;color:var(--gold)'
+    : 'background:#0d1f0d;border:1px solid #1a3a1a;border-radius:6px;padding:4px 10px;font-size:.78rem;color:var(--green)';
+
+  const tagsHtml = `
     <div class="field">
-      <label>Esercizi nel circuito (× per rimuovere)</label>
+      <label>${circ ? 'Esercizi nel circuito (× per rimuovere)' : 'Esercizi (× per rimuovere — il primo dà la GIF)'}</label>
       <div class="circ-tags" id="ctags-${g}-${i}">
-        ${(es.nomi_circuito||[]).length === 0
+        ${tagList.length === 0
           ? '<span style="font-size:.75rem;color:var(--muted)">Nessun esercizio aggiunto</span>'
-          : (es.nomi_circuito||[]).map((n, ti) => `
-            <div class="circ-tag">
+          : tagList.map((n, ti) => `
+            <div style="${tagStyle};display:inline-flex;align-items:center;gap:5px">
               <span>${n}</span>
-              <button onclick="removeCircTag(${g},${i},${ti})" title="Rimuovi">×</button>
+              <button onclick="${circ ? `removeCircTag` : `removeNormTag`}(${g},${i},${ti})" title="Rimuovi" style="background:none;border:none;color:${circ?'#cc8800':'#009944'};cursor:pointer;font-size:1rem;line-height:1;padding:0;margin-left:2px">×</button>
             </div>`).join('')}
       </div>
-    </div>` : '';
- 
-  // FIX disabled: usiamo stringa condizionale, non attributo booleano
+    </div>`;
+
   const disUp   = i === 0         ? 'disabled' : '';
   const disDown = i === total - 1 ? 'disabled' : '';
- 
+
   return `<div class="es-card ${isOpen?'open':''}" id="ec-${g}-${i}">
     <div class="es-card-header" onclick="togEs(${g},${i})">
       <span class="es-num">ES.${i+1}</span>
@@ -686,11 +697,11 @@ function buildEsCard(g, i, es) {
     </div>
     <div class="es-card-body">
       <div class="field">
-        <label>${circ?'Aggiungi esercizio al circuito':'Cerca esercizio'}</label>
+        <label>${circ ? 'Aggiungi esercizio al circuito' : 'Cerca esercizio (puoi aggiungerne più di uno)'}</label>
         <div class="search-wrap">
           <span class="search-icon">🔍</span>
           <input class="search-input" type="text"
-            placeholder="${circ?'Cerca e aggiungi...':(es.nome||'digita per cercare...')}"
+            placeholder="${circ ? 'Cerca e aggiungi...' : 'digita per cercare...'}"
             id="si-${g}-${i}" oninput="cercaEs(${g},${i},this.value)" onfocus="openSearch(${g},${i})" autocomplete="off">
         </div>
         <div class="search-results" id="sr-${g}-${i}"></div>
@@ -729,6 +740,16 @@ function removeCircTag(g, i, ti) {
   esState[g][i].nome = esState[g][i].nomi_circuito.join(', ');
   renderEsPanel();
 }
+
+function removeNormTag(g, i, ti) {
+  esState[g][i].nomi_normali.splice(ti, 1);
+  // Il primo esercizio della lista dà nome e gif
+  esState[g][i].nome = esState[g][i].nomi_normali[0] || '';
+  esState[g][i].gif_file = esState[g][i].nomi_normali.length > 0
+    ? gifPath(esState[g][i].nomi_normali[0], esState[g][i]._gifGruppo0 || '')
+    : '';
+  renderEsPanel();
+}
  
 function togEs(g, i) {
   const c = document.getElementById(`ec-${g}-${i}`);
@@ -738,7 +759,7 @@ function togEs(g, i) {
  
 function addEs(g) {
   esState[g].forEach(e => e._open = false);
-  esState[g].push({nome:'',tipo:'normale',serie:4,reps:'12',recupero_sec:90,tempo_lavoro_sec:30,note:'',gif_file:'',nomi_circuito:[],_open:true});
+  esState[g].push({nome:'',tipo:'normale',serie:4,reps:'12',recupero_sec:90,tempo_lavoro_sec:30,note:'',gif_file:'',nomi_circuito:[],nomi_normali:[],_open:true});
   renderEsPanel();
 }
  
@@ -757,6 +778,7 @@ function setF(g, i, f, v) { esState[g][i][f] = v; }
 function setTipo(g, i, t) {
   esState[g][i].tipo = t;
   if(t === 'circuito' && !esState[g][i].nomi_circuito) esState[g][i].nomi_circuito = [];
+  if(t === 'normale' && !esState[g][i].nomi_normali) esState[g][i].nomi_normali = [];
   renderEsPanel();
 }
  
@@ -810,8 +832,17 @@ function selEsFromEl(el) {
     if(!es.nomi_circuito.includes(nome)) es.nomi_circuito.push(nome);
     es.nome = es.nomi_circuito.join(', ');
   } else {
-    es.nome = nome;
-    es.gif_file = gifPath(nome, gruppo);
+    // Tipo normale: supporta più esercizi, il primo dà nome e gif
+    if(!es.nomi_normali) es.nomi_normali = [];
+    if(!es.nomi_normali.includes(nome)) {
+      es.nomi_normali.push(nome);
+      // Salva il gruppo del primo elemento per la gif
+      if(es.nomi_normali.length === 1) {
+        es._gifGruppo0 = gruppo;
+        es.gif_file = gifPath(nome, gruppo);
+      }
+    }
+    es.nome = es.nomi_normali[0] || nome; // il nome principale è il primo
   }
   document.getElementById(`sr-${g}-${i}`)?.classList.remove('open');
   document.getElementById(`si-${g}-${i}`).value = '';
@@ -832,9 +863,17 @@ function buildJSON_internal() {
     const ms = muscG[i] || [];
     const titolo = ms.map(m => m.toUpperCase()).join(' & ') || `GIORNO ${i+1}`;
     const esercizi = (esState[i] || []).map(es => {
-      const nomeOut = es.tipo === 'circuito' && es.nomi_circuito && es.nomi_circuito.length
-        ? es.nomi_circuito.join(', ')
-        : (es.nome || 'ESERCIZIO');
+      let nomeOut;
+      if(es.tipo === 'circuito') {
+        nomeOut = (es.nomi_circuito && es.nomi_circuito.length)
+          ? es.nomi_circuito.join(', ')
+          : (es.nome || 'ESERCIZIO');
+      } else {
+        // Per normale: se ci sono più esercizi in nomi_normali, il nome è il primo
+        nomeOut = (es.nomi_normali && es.nomi_normali.length)
+          ? es.nomi_normali[0]
+          : (es.nome || 'ESERCIZIO');
+      }
       const o = {tipo: es.tipo||'normale', nome: nomeOut, serie: es.serie||4, reps: es.reps||'12', recupero_sec: es.recupero_sec||90};
       if(es.tipo === 'circuito') o.tempo_lavoro_sec = es.tempo_lavoro_sec || 30;
       if(es.note) o.note = es.note;
