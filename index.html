@@ -718,7 +718,7 @@ function buildEsCard(g, i, es) {
         <label>GIF personalizzata (opzionale)</label>
         <div style="background:#0a0a0a;border:1px solid var(--border);border-radius:8px;padding:10px 12px;font-size:.78rem;color:var(--muted2);line-height:1.6;margin-bottom:8px">
           📐 <strong style="color:var(--text)">Requisiti:</strong> ~100×100px, sfondo nero<br>
-          🛠 <strong style="color:var(--text)">ezgif.com →</strong> Resize (100px), Effects → Change Background Color (#000000) → Optimize → Coalesce<br>
+          🛠 <strong style="color:var(--text)">ezgif.com →</strong> Resize (100px) → Effects → Change Background Color (#000000) → Optimize → Coalesce<br>
           💾 <strong style="color:var(--text)">Salva nella SD:</strong> <span id="gif-path-hint-${g}-${i}" style="color:var(--gold);font-family:monospace">${es.gif_file ? es.gif_file : '/gifs/GRUPPO/nome_file.gif'}</span>
         </div>
         <div style="display:flex;gap:8px;align-items:center">
@@ -1063,9 +1063,7 @@ async function bleInviaScheda() {
     await sleep(600);
   } catch(e) { bLog('Errore JSON: ' + e.message,'err'); po.classList.remove('show'); return; }
 
-  // 2. Invia GIF
-  if(!bGif) { bLog('Canale GIF non disponibile.','err'); po.classList.remove('show'); return; }
-
+  // 2. Invia GIF (solo se il canale è disponibile e ci sono GIF)
   const gifQueue = [];
   for(let g = 0; g < esState.length; g++)
     for(let i = 0; i < esState[g].length; i++) {
@@ -1075,6 +1073,8 @@ async function bleInviaScheda() {
 
   if(gifQueue.length === 0) {
     bLog('Nessuna GIF da inviare.','info');
+  } else if(!bGif) {
+    bLog('⚠️ Canale GIF non disponibile — GIF saltate.','err');
   } else {
     bLog('Invio ' + gifQueue.length + ' GIF...','info');
     for(const g of gifQueue) {
@@ -1091,6 +1091,12 @@ async function bleInviaScheda() {
       } catch(err) { bLog('Errore GIF ' + g.path + ': ' + err.message,'err'); }
     }
   }
+
+  // 3. FIX: invia DONE → l'ESP32 elabora SOLO ora (dopo JSON + tutte le GIF)
+  try {
+    await bRx.writeValueWithResponse(new TextEncoder().encode('DONE'));
+    bLog('✅ DONE inviato — ESP32 aggiornerà la scheda.','ok');
+  } catch(e) { bLog('Errore DONE: ' + e.message,'err'); }
 
   setTimeout(() => po.classList.remove('show'), 2000);
 }
