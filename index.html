@@ -111,7 +111,6 @@ main::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
 .ble-log{margin:0 20px;background:#0a0a0a;border:1px solid var(--border);border-radius:8px;padding:10px 12px;font-size:.72rem;font-family:monospace;color:var(--muted);max-height:140px;overflow-y:auto}
 .ble-log .ok{color:var(--green)}.ble-log .err{color:var(--red)}.ble-log .info{color:var(--gold)}
 .add-btn-wrap{padding:0 20px;margin-top:6px}
-/* move buttons style */
 .btn-move{background:var(--card2);color:var(--muted2);border:1px solid var(--border);padding:4px 8px;font-size:.8rem;border-radius:6px;cursor:pointer;line-height:1;flex-shrink:0}
 .btn-move:disabled{opacity:.25;cursor:not-allowed}
 </style>
@@ -123,7 +122,7 @@ main::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
   <div style="width:60px"></div>
 </header>
 <main id="ms">
- 
+
 <!-- STEP 1 -->
 <div class="screen active" id="screen-1">
   <div class="hero">
@@ -143,7 +142,7 @@ main::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
     </div>
   </div>
 </div>
- 
+
 <!-- STEP 2 -->
 <div class="screen" id="screen-2">
   <div class="section-wrap">
@@ -161,7 +160,7 @@ main::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
     <div class="day-btn" onclick="selGiorni(7)"><div class="num">7</div><div class="label">GIORNI</div></div>
   </div>
 </div>
- 
+
 <!-- STEP 3 -->
 <div class="screen" id="screen-3">
   <div class="section-wrap">
@@ -172,7 +171,7 @@ main::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
   <div class="giorno-tabs" id="musc-tabs"></div>
   <div style="padding:16px 20px 0" id="musc-panel"></div>
 </div>
- 
+
 <!-- STEP 4 -->
 <div class="screen" id="screen-4">
   <div class="section-wrap">
@@ -183,7 +182,7 @@ main::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
   <div class="giorno-tabs" id="es-tabs"></div>
   <div id="es-panel" style="padding-top:16px"></div>
 </div>
- 
+
 <!-- STEP 5 -->
 <div class="screen" id="screen-5">
   <div class="section-wrap">
@@ -193,7 +192,7 @@ main::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
   </div>
   <div id="summary" style="margin-top:16px"></div>
 </div>
- 
+
 <!-- STEP 6 -->
 <div class="screen" id="screen-6">
   <div class="section-wrap">
@@ -218,13 +217,13 @@ main::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
     <label class="btn btn-gray" style="flex:1;cursor:pointer">📂 Carica JSON<input type="file" accept=".json,application/json" style="display:none" onchange="caricaJSON(event)"></label>
   </div>
 </div>
- 
+
 </main>
 <div class="bottom-bar">
   <button class="btn btn-ghost btn-back" id="btn-back" onclick="stepBack()" style="width:52px">←</button>
   <button class="btn btn-gold btn-next" id="btn-next" onclick="stepNext()">Avanti →</button>
 </div>
- 
+
 <script>
 const DB = {
   Pettorali:["Croce ai cavi alti e bassi per il petto","Flessione del Polso Inversa","Distensione con bilanciere su pavimento","Distensione dei pettorali bassi al cavo in piedi","Distensione su Panca Inclinata con Bilanciere","Piegamento in stile Superman","Dip Coreano","Panca Inclinata con Cavi Bassi","Distensione dei pettorali al cavo in piedi","Flessione sulle nocche","Cavo Inginocchiato Croce Alta-Bassa","Croce ai Cavi con un Braccio","Flessione a Terra con Salto","Boxe con Sacco da Allenamento","Dip in Planche","Flessione Profonda su Parallele","Croce con Manubri su Panca Inclinata Bassa","Piegamento su Braccio Singolo","Dips alla Sbarra Diritta","Push-Up Scapolare","Croce Bassa con Manubrio a un Braccio","Distensione con manubri a presa stretta","Croce ai cavi per il petto medio","Pressa di Svend","Distensione con manubri su pavimento","Flessione su Panca Inclinata Negativa","Pressa su panca con bilanciere guidato","Pressa Larsen con manubri","Push-Up Negativo","Panca Inclinata con Manubri","Apertura su panca con manubri","Pullover con bilanciere","Apertura su Pec Deck","Distensione su panca con manubri a presa neutra","Pressa Poliquin con manubri","Distensione su panca declinata con bilanciere","Piegamento sulle Braccia","Croce ai cavi da seduto","Distensione su panca con fascia elastica","Distensione con manubri su panca inclinata a presa neutra","Flessione sulle braccia in ginocchio con anelli","Apertura con Elastico per Pettorali","Distensione su panca declinata con cavi","Aperture al petto in sospensione","Pressa Spoto","Distensione su Panca con Bilanciere e Catene","Distensione su panca inclinata con manubrio a un braccio","Pressa Larsen con bilanciere","Croce con Manubri su Panca Inclinata","Pressa Pettorale su Macchina","Distensione su panca declinata","Croce su panca con cavi","Flessione con Fascia di Resistenza","Piegamento con Battito di Mani","Croce ai Cavi con Elastico in Inclinazione","Croce ai cavi unilaterale dall'alto verso il basso","Piegamento a Freccia","Distensione su panca con manubri","Pressa su Panca Inclinata con Manubri a Presa Neutra","Pressa di forza con un braccio incrociato sul corpo","Dip per il petto","Distensione a terra con kettlebell a un braccio","Pressa in Piedi con Rotazione","Distensione su panca piana con bilanciere","Tocco della Spalla","Distensione su panca con cavo da seduti","Flessione su anelli","Distensione su panca con manubrio a un braccio","Flessione a Terra in Ginocchio con Presa Larga","Distensione su Panca Inclinata Negativa con Manubri","Piegamenti sulle Braccia a Presa Larga","Flessione sulle parallele","Distensione su Panca con Fascia di Resistenza","Panca Piana con Fermata","Croce ai cavi unilaterale dal basso verso l'alto","Pressa per Pettorali con Impugnatura a Martello","Pressa su Panca Inclinata Negativa con Smith Machine","Apertura su Macchina per Pettorali","Pressa per il Petto su Macchina","Panca con bilanciere","Apertura con manubri dal basso verso l'alto","Flessione delle braccia con appoggio sulle ginocchia","Flessione sulle Dita","Aperture con Manubri su Panca Inclinata Negativa","Pressa su Panca Inclinata con Smith Machine","Flessione su Panca Inclinata","Distensione su panca con cavi","Piegamenti sulle braccia con sovraccarico","Apertura con manubri su panca piana","Aperture Poliquin","Piegamento Profondo con Manubri","Croci ai Cavi su Panca Inclinata","Planche inclinato"],
@@ -237,13 +236,7 @@ const DB = {
   Avambracci:["Pronazione con manubri da sdraiato","Curl con manubrio a polso neutro con un braccio","Curl del Polso con Manubrio a un Braccio","Curl inverso del polso da seduto con bilanciere EZ","Supinazione con Manubrio a un Braccio","Camminata del Contadino","Curl del polso in piedi con bilanciere","Curl del polso in piedi con manubri","Flessione del Polso","Curl dei polsi in piedi con bilanciere","Rullo per i polsi","Curl del Polso Seduto con EZ-Bar","Curl con bilanciere a presa inversa per gli avambracci","Camminata del Contadino Unilaterale","Curl inverso con bilanciere EZ su panca inclinata","Trasporto del Contadino con Manubri","Curl con presa inversa con bilanciere EZ","Flessioni Inverse del Polso in Piedi con Manubri","Sospensione Passiva","Curl Inverso del Polso con Bilanciere","Curl con presa inversa al cavo","Curl inverso con manubri per bicipiti","Curl dei Polsi al Cavo","Flessione del Polso al Cavo da Seduto","Retrazioni Scapolari in Sospensione","Curl con bilanciere per i polsi","Pinza per mani","Curl Inverso del Polso con Manubrio a un Braccio","Rotazione del Polso in Piedi con Cavo"],
   Addominali:["Crunch con ginocchia al petto","Mulino a Vento a Corpo Libero","Rotazione del Tronco","Sospensione in posizione a L","Flessione Laterale in Piedi con Elastico","Torsione da seduto","Rotazione al Cavo (orizzontale)","Gambe Dentro e Fuori","Crunch su panca declinata con sovraccarico","Calci a Forbice in Sospensione","Rotolamento con Ruota per Addominali","Ponte Laterale con Manubri","Crunch addominali","Crunch con torsione in piedi con elastico","Posizione del Corpo Cavo","Crunch con Braccia Tese e Sovraccarico","Sollevamento delle Gambe Tese su Sbarre Parallele","Rotazione al Cavo (alto-basso)","Crunch alternati da seduti","Sollevamento delle Ginocchia al Petto in Sospensione","Sollevamenti delle gambe su panca inclinata","Bandiera del Drago","Sit Up con Sovraccarico","Insetto Morto","Torsione russa con palla medica","Pressa Pallof con Elastico","Torsione Russa con Elastico","Crunch in piedi con elastico","Crunch Laterale in Ginocchio al Cavo","Crunch addominali alla macchina","Crunch a Bicicletta","Forbici","Pressa Pallof Orizzontale al Cavo Basso","Sollevamento delle ginocchia ai gomiti in sospensione","Dead Bug con Peso","Crunch su Palla di Stabilità","Crunch addominali in ginocchio con elastico","Torsione in Piedi con Bilanciere","Crunch addominale","Sollevamento delle gambe dritte da sdraiato","Crunch su macchina in posizione supina","Piegamento ad Anello","Dead Bug con Palla","Plank","Ginocchia alle Gomiti in Sospensione","Crunch circolari inversi da seduti","Sollevamento a V","Rotazione Orizzontale con Elastico","Crunch a V","Piedi Alla Sbarra","Bicicletta Aria in Piedi","Plank con Sovraccarico","Bicicletta Aria","Arrampicata a terra","Sollevamenti delle Gambe Tese alla Sedia del Capitano","Sit Up Inclinato con Rotazione","Cerchi con le Ginocchia in Sospensione","Crunch a Rana","Sollevamento delle Gambe alla Sbarra","Sollevamento delle gambe dritte in sospensione","Torsione con Fascia da Alto a Basso","Chop con Fascia in Mezzo Ginocchio","Posizione a Cavo con Peso","Sollevamento Ginocchia su Ab Coaster","Rotazione del Tronco alla Macchina da Seduti","Sollevamento delle Gambe da Seduto","Crunch Laterale","Sollevamenti a V in Sospensione","Crunch inverso","Flessione Laterale in Piedi con Manubri","Tocchi delle Dita dei Piedi","Torsione Russa con Manubri","Mezzo Mulino a Vento in Sospensione","Torsione Russa con Peso","Calci Alternati da Seduto","Plank Laterale","Plank su Fitball","Plank a sega","Crunch Addominale in Piedi al Cavo","Rotolamento con Bilanciere - Inginocchiato","Rotazione dal basso verso l'alto","Crunch con Fascia in Ginocchio e Rotazione","Plank a quattro zampe","Torsione Spinale da Supino","Sit Up di Janda","Torsione Russa in Piedi","Vuoto Addominale","Crunch Addominale al Cavo da Seduto","Sollevamento delle gambe sospeso con sovraccarico","Crunch addominali con sovraccarico","Gomito al ginocchio del lato opposto","Pressa Pallof Orizzontale ai Cavi","Rotazione con Bilanciere a Terra","Crunch a Bicicletta con Elastico","Sollevamento delle Ginocchia Obliquo in Sospensione","Tocchi alla Caviglia","Sollevamenti delle ginocchia in sospensione","Crunch addominali in ginocchio con cavo","Crunch su panca declinata","Torsione con Bilanciere da Seduti","Sollevamenti delle Ginocchia alla Sedia del Capitano","Sit Up","Plank Laterale Destro","Plank Laterale Sinistro","Plank ai Gomiti","Plank Completo"]
 };
- 
-// ══════════════════════════════════════════════════
-// ALIAS INGLESI — permette di cercare in inglese
-// trovando comunque l'esercizio col nome italiano.
-// Chiave = nome italiano (deve corrispondere al DB).
-// Valore = stringa con termini inglesi separati da spazio.
-// ══════════════════════════════════════════════════
+
 const ALIAS = {
   "Piegamento sulle Braccia":"push up pushup chest",
   "Panca con bilanciere":"bench press barbell flat",
@@ -446,22 +439,18 @@ const ALIAS = {
   "Crunch Laterale":"lateral crunch oblique side crunch",
 };
 
-
-// Costruisce array piatto con nome italiano + alias per la ricerca
 const ALL_ES = [];
 Object.entries(DB).forEach(([g, l]) => {
   l.forEach(n => {
     if(n) ALL_ES.push({
-      nome: n,           // nome italiano — quello che viene salvato e genera la GIF
+      nome: n,
       gruppo: g,
-      cerca: (n + ' ' + (ALIAS[n] || '')).toLowerCase()  // campo di ricerca: IT + EN
+      cerca: (n + ' ' + (ALIAS[n] || '')).toLowerCase()
     });
   });
 });
- 
+
 function gifPath(nome, gruppo) {
-  // Normalizza: minuscolo, accenti rimossi, spazi→underscore, resto eliminato
-  // Deve corrispondere esattamente ai nomi file .gif sulla SD (es: pressa_per_le_gambe.gif)
   const slug = nome.toLowerCase()
     .replace(/à/g,'a').replace(/è/g,'e').replace(/é/g,'e')
     .replace(/ì/g,'i').replace(/ò/g,'o').replace(/ù/g,'u')
@@ -470,14 +459,14 @@ function gifPath(nome, gruppo) {
     .trim().replace(/\s+/g,'_');
   return '/gifs/' + gruppo + '/' + slug + '.gif';
 }
- 
+
 // ══════════════════════════════════════════════════
 // STATO
 // ══════════════════════════════════════════════════
 let step = 1, STEPS = 6;
 let scheda = {nome_utente:'USER', giorni:[]};
 let numG = 0, muscG = [], tabMusc = 0, tabEs = 0, esState = [];
- 
+
 // ══════════════════════════════════════════════════
 // CARICA JSON STEP 1
 // ══════════════════════════════════════════════════
@@ -499,23 +488,22 @@ function caricaJSONStep1(ev) {
         }).filter(Boolean);
       });
       esState = p.giorni.map(g =>
-        (g.esercizi || []).map(es => ({
-          nome: es.nome || '',
-          tipo: es.tipo || 'normale',
-          serie: es.serie || 4,
-          reps: es.reps || '12',
-          recupero_sec: es.recupero_sec || 90,
-          tempo_lavoro_sec: es.tempo_lavoro_sec || 30,
-          note: es.note || '',
-          gif_file: es.gif_file || '',
-          nomi_circuito: es.tipo === 'circuito'
-            ? (es.nome || '').split(',').map(n => n.trim()).filter(Boolean)
-            : [],
-          nomi_normali: es.tipo !== 'circuito'
-            ? (es.nome || '').split(',').map(n => n.trim()).filter(Boolean)
-            : [],
-          _open: false
-        }))
+        (g.esercizi || []).map(es => {
+          const nomiArr = (es.nome || '').split(',').map(n => n.trim()).filter(Boolean);
+          return {
+            nome: es.nome || '',
+            tipo: es.tipo || 'normale',
+            serie: es.serie || 4,
+            reps: es.reps || '12',
+            recupero_sec: es.recupero_sec || 90,
+            tempo_lavoro_sec: es.tempo_lavoro_sec || 30,
+            note: es.note || '',
+            gif_file: es.gif_file || '',
+            nomi_circuito: es.tipo === 'circuito' ? nomiArr : [],
+            nomi_normali: es.tipo !== 'circuito' ? nomiArr : [],
+            _open: false
+          };
+        })
       );
       document.getElementById('load-card-info').innerHTML =
         `✅ <strong>${p.nome_utente}</strong> — ${numG} giorni caricati`;
@@ -526,7 +514,7 @@ function caricaJSONStep1(ev) {
   };
   r.readAsText(f);
 }
- 
+
 function clearJSON() {
   scheda = {nome_utente:'USER', giorni:[]};
   numG = 0; muscG = []; esState = [];
@@ -535,7 +523,7 @@ function clearJSON() {
   document.getElementById('btn-clear-json').style.display = 'none';
   document.querySelectorAll('.day-btn').forEach(b => b.classList.remove('selected'));
 }
- 
+
 // ══════════════════════════════════════════════════
 // NAV
 // ══════════════════════════════════════════════════
@@ -552,13 +540,13 @@ function upd() {
   if(step === 6) { bn.style.display = 'none'; }
   else { bn.style.display = ''; bn.textContent = step === 5 ? '📡 Invia →' : 'Avanti →'; }
 }
- 
+
 function show(n) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById('screen-' + n).classList.add('active');
   document.getElementById('ms').scrollTop = 0;
 }
- 
+
 function stepNext() {
   if(step === 1) {
     const n = document.getElementById('input-nome').value.trim();
@@ -574,9 +562,9 @@ function stepNext() {
   if(step === 5) renderSummary();
   show(step); upd();
 }
- 
+
 function stepBack() { if(step <= 1) return; step--; show(step); upd(); }
- 
+
 // ══════════════════════════════════════════════════
 // STEP 2
 // ══════════════════════════════════════════════════
@@ -584,17 +572,17 @@ function selGiorni(n) {
   numG = n;
   document.querySelectorAll('.day-btn').forEach((b, i) => b.classList.toggle('selected', i+1 === n));
 }
- 
+
 // ══════════════════════════════════════════════════
 // STEP 3 — MUSCOLI
 // ══════════════════════════════════════════════════
 const MUSC = ['Pettorali','Schiena','Spalle','Gambe','Glutei','Bicipiti','Tricipiti','Avambracci','Addominali'];
- 
+
 function initMusc() {
   if(muscG.length !== numG) muscG = Array.from({length: numG}, () => []);
   tabMusc = 0; renderMuscTabs(); renderMuscPanel();
 }
- 
+
 function renderMuscTabs() {
   const t = document.getElementById('musc-tabs'); t.innerHTML = '';
   for(let i = 0; i < numG; i++) {
@@ -605,7 +593,7 @@ function renderMuscTabs() {
     t.appendChild(d);
   }
 }
- 
+
 function renderMuscPanel() {
   const sel = muscG[tabMusc] || [];
   document.getElementById('musc-panel').innerHTML = `
@@ -616,13 +604,13 @@ function renderMuscPanel() {
       ${MUSC.map(m => `<div class="muscolo-chip ${sel.includes(m)?'selected':''}" onclick="togMusc('${m}')">${m}${sel.includes(m)?' ✓':''}</div>`).join('')}
     </div>`;
 }
- 
+
 function togMusc(m) {
   const s = muscG[tabMusc], i = s.indexOf(m);
   if(i >= 0) s.splice(i, 1); else s.push(m);
   renderMuscPanel();
 }
- 
+
 // ══════════════════════════════════════════════════
 // STEP 4 — ESERCIZI
 // ══════════════════════════════════════════════════
@@ -630,7 +618,7 @@ function initEs() {
   if(esState.length !== numG) esState = Array.from({length: numG}, () => []);
   tabEs = 0; renderEsTabs(); renderEsPanel();
 }
- 
+
 function renderEsTabs() {
   const t = document.getElementById('es-tabs'); t.innerHTML = '';
   for(let i = 0; i < numG; i++) {
@@ -642,7 +630,7 @@ function renderEsTabs() {
     t.appendChild(d);
   }
 }
- 
+
 function renderEsPanel() {
   const panel = document.getElementById('es-panel');
   const list = esState[tabEs] || [];
@@ -651,20 +639,18 @@ function renderEsPanel() {
   h += `</div><div class="add-btn-wrap"><button class="btn btn-gray btn-sm" style="width:100%" onclick="addEs(${tabEs})">+ Aggiungi Esercizio</button></div>`;
   panel.innerHTML = h;
 }
- 
+
 function buildEsCard(g, i, es) {
   const circ = es.tipo === 'circuito';
   const total = esState[g].length;
   const isOpen = es._open === true || (i === total - 1 && es._open !== false);
 
-  // Preview: usa lista tag (sia normale che circuito)
+  // FIX: preview mostra TUTTI i nomi
   const tagList = circ ? (es.nomi_circuito||[]) : (es.nomi_normali||[]);
   const preview = tagList.length
     ? tagList.join(', ')
     : (es.nome || 'Nuovo esercizio');
 
-  // Tag HTML per ENTRAMBI i tipi
-  const tagColor = circ ? 'circ' : 'norm';
   const tagStyle = circ
     ? 'background:#1f1400;border:1px solid #3a2a00;border-radius:6px;padding:4px 10px;font-size:.78rem;color:var(--gold)'
     : 'background:#0d1f0d;border:1px solid #1a3a1a;border-radius:6px;padding:4px 10px;font-size:.78rem;color:var(--green)';
@@ -728,13 +714,89 @@ function buildEsCard(g, i, es) {
       ${circ?`<div class="field"><label>Tempo Lavoro per esercizio (sec)</label>
         <input type="number" min="1" max="300" value="${es.tempo_lavoro_sec||30}" oninput="setF(${g},${i},'tempo_lavoro_sec',parseInt(this.value)||30)">
       </div>`:''}
+      ${!circ?`<div class="field">
+        <label>GIF personalizzata (opzionale)</label>
+        <div style="background:#0a0a0a;border:1px solid var(--border);border-radius:8px;padding:10px 12px;font-size:.78rem;color:var(--muted2);line-height:1.6;margin-bottom:8px">
+          📐 <strong style="color:var(--text)">Requisiti:</strong> ~100×100px, sfondo nero<br>
+          🛠 <strong style="color:var(--text)">ezgif.com →</strong> Resize (100px) → Effects → Change Background Color (#000000) → Optimize → Coalesce<br>
+          💾 <strong style="color:var(--text)">Salva nella SD:</strong> <span id="gif-path-hint-${g}-${i}" style="color:var(--gold);font-family:monospace">${es.gif_file ? es.gif_file : '/gifs/GRUPPO/nome_file.gif'}</span>
+        </div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <label class="btn btn-gray btn-sm" style="cursor:pointer;flex:1">
+            ${es._gifPreview ? '✅ GIF caricata' : '📂 Carica GIF per anteprima'}
+            <input type="file" accept=".gif,image/gif" style="display:none" onchange="caricaGifPreview(${g},${i},this)">
+          </label>
+          ${es._gifPreview ? `<button class="btn btn-red btn-sm" onclick="rimuoviGifPreview(${g},${i})">✕</button>` : ''}
+        </div>
+        ${es._gifPreview ? `<div style="margin-top:8px;text-align:center">
+          <img src="${es._gifPreview}" style="width:100px;height:100px;object-fit:contain;background:#000;border:1px solid var(--border);border-radius:6px">
+        </div>` : ''}
+        ${es.gif_file ? `<div style="margin-top:8px;background:#1a1000;border:1px solid #4a3000;border-radius:8px;padding:8px 12px;font-size:.76rem;line-height:1.7">
+          ⚠️ <strong style="color:var(--text)">Le GIF NON vengono inviate via BLE.</strong><br>
+          Copia manualmente il file nella SD nel percorso:<br>
+          <code style="color:var(--gold2);word-break:break-all;font-size:.74rem">${es.gif_file}</code>
+        </div>` : ''}
+        <div class="field" style="margin-top:8px">
+          <label>Percorso SD (modificabile manualmente)</label>
+          <input type="text" value="${es.gif_file||''}" placeholder="/gifs/Pettorali/nome_esercizio.gif"
+            oninput="setF(${g},${i},'gif_file',this.value);aggiornaGifHint(${g},${i},this.value)">
+        </div>
+      </div>`:''}
       <div class="field"><label>Note (opzionale)</label>
         <textarea placeholder="Indicazioni tecniche, peso..." oninput="setF(${g},${i},'note',this.value)">${es.note||''}</textarea>
       </div>
     </div>
   </div>`;
 }
- 
+
+function caricaGifPreview(g, i, input) {
+  const f = input.files[0]; 
+  if(!f) return;
+
+  const es = esState[g][i];
+  
+  // Recupera il nome dell'esercizio (il primo se ce ne sono multipli)
+  const nomeEsercizio = es.nomi_normali && es.nomi_normali.length > 0 
+    ? es.nomi_normali[0] 
+    : (es.nome || 'esercizio_custom');
+
+  // Genera lo slug standardizzato (lowercase, senza accenti, spazi -> underscore)
+  const slug = nomeEsercizio.toLowerCase()
+    .replace(/[àáâ]/g,'a').replace(/[èéê]/g,'e').replace(/[ìí]/g,'i')
+    .replace(/[òó]/g,'o').replace(/[ùú]/g,'u')
+    .replace(/[^a-z0-9]/g,'_') // Sostituisce tutto ciò che non è alfanumerico con _
+    .replace(/_+/g,'_')        // Evita underscore multipli (es. __)
+    .replace(/^_|_$/g,'');     // Rimuove underscore all'inizio o alla fine
+
+  // Determina il gruppo muscolare per la cartella
+  const trovato = ALL_ES.find(e => e.nome === es.nomi_normali[0]);
+  const gruppo = trovato ? trovato.gruppo : 'Custom';
+  
+  // Forza il percorso basato sul nome dell'esercizio, ignorando il nome file originale
+  const percorsoFinalizzato = `/gifs/${gruppo}/${slug}.gif`;
+  
+  es.gif_file = percorsoFinalizzato;
+  esState[g][i]._gifFile = f;
+
+  const reader = new FileReader();
+  reader.onload = ev => {
+    esState[g][i]._gifPreview = ev.target.result;
+    renderEsPanel();
+  };
+  reader.readAsDataURL(f);
+}
+
+function rimuoviGifPreview(g, i) {
+  esState[g][i]._gifPreview = null;
+  esState[g][i]._gifFile = null;
+  renderEsPanel();
+}
+
+function aggiornaGifHint(g, i, val) {
+  const el = document.getElementById(`gif-path-hint-${g}-${i}`);
+  if(el) el.textContent = val || '/gifs/GRUPPO/nome_file.gif';
+}
+
 function removeCircTag(g, i, ti) {
   esState[g][i].nomi_circuito.splice(ti, 1);
   esState[g][i].nome = esState[g][i].nomi_circuito.join(', ');
@@ -743,28 +805,33 @@ function removeCircTag(g, i, ti) {
 
 function removeNormTag(g, i, ti) {
   esState[g][i].nomi_normali.splice(ti, 1);
-  // Il primo esercizio della lista dà nome e gif
-  esState[g][i].nome = esState[g][i].nomi_normali[0] || '';
-  esState[g][i].gif_file = esState[g][i].nomi_normali.length > 0
-    ? gifPath(esState[g][i].nomi_normali[0], esState[g][i]._gifGruppo0 || '')
-    : '';
+  // FIX: cerca il gruppo del nuovo primo elemento dal DB, non da _gifGruppo0
+  if(esState[g][i].nomi_normali.length > 0) {
+    const primoNome = esState[g][i].nomi_normali[0];
+    const trovato = ALL_ES.find(e => e.nome === primoNome);
+    esState[g][i].gif_file = trovato ? gifPath(primoNome, trovato.gruppo) : (esState[g][i].gif_file || '');
+  } else {
+    esState[g][i].gif_file = '';
+  }
+  // FIX: aggiorna nome con tutti i nomi rimanenti
+  esState[g][i].nome = esState[g][i].nomi_normali.join(', ');
   renderEsPanel();
 }
- 
+
 function togEs(g, i) {
   const c = document.getElementById(`ec-${g}-${i}`);
   esState[g][i]._open = !c.classList.contains('open');
   c.classList.toggle('open');
 }
- 
+
 function addEs(g) {
   esState[g].forEach(e => e._open = false);
   esState[g].push({nome:'',tipo:'normale',serie:4,reps:'12',recupero_sec:90,tempo_lavoro_sec:30,note:'',gif_file:'',nomi_circuito:[],nomi_normali:[],_open:true});
   renderEsPanel();
 }
- 
+
 function delEs(g, i) { esState[g].splice(i, 1); renderEsPanel(); }
- 
+
 function moveEs(g, i, dir) {
   const list = esState[g];
   const j = i + dir;
@@ -772,18 +839,18 @@ function moveEs(g, i, dir) {
   [list[i], list[j]] = [list[j], list[i]];
   renderEsPanel();
 }
- 
+
 function setF(g, i, f, v) { esState[g][i][f] = v; }
- 
+
 function setTipo(g, i, t) {
   esState[g][i].tipo = t;
   if(t === 'circuito' && !esState[g][i].nomi_circuito) esState[g][i].nomi_circuito = [];
   if(t === 'normale' && !esState[g][i].nomi_normali) esState[g][i].nomi_normali = [];
   renderEsPanel();
 }
- 
+
 // ══════════════════════════════════════════════════
-// RICERCA — cerca su tutto il DB
+// RICERCA
 // ══════════════════════════════════════════════════
 function openSearch(g, i) {
   const muscoli = muscG[g] || [];
@@ -798,18 +865,17 @@ function openSearch(g, i) {
   sr.innerHTML = pool.map(e => buildSearchItem(g, i, e)).join('');
   sr.classList.add('open');
 }
- 
+
 function cercaEs(g, i, q) {
   const sr = document.getElementById(`sr-${g}-${i}`);
   if(!q || q.length < 2) { sr.classList.remove('open'); return; }
-  // Ricerca multi-parola su nome italiano + alias inglesi (ordine libero, case-insensitive)
   const tokens = q.toLowerCase().trim().split(/\s+/).filter(t => t.length > 0);
   const m = ALL_ES.filter(e => tokens.every(tok => e.cerca.includes(tok))).slice(0, 20);
   if(!m.length) { sr.classList.remove('open'); return; }
   sr.innerHTML = m.map(e => buildSearchItem(g, i, e)).join('');
   sr.classList.add('open');
 }
- 
+
 function buildSearchItem(g, i, e) {
   const alias = ALIAS[e.nome];
   const sub = alias
@@ -822,7 +888,7 @@ function buildSearchItem(g, i, e) {
     </div>
   </div>`;
 }
- 
+
 function selEsFromEl(el) {
   const g = parseInt(el.dataset.g), i = parseInt(el.dataset.i);
   const nome = el.dataset.nome, gruppo = el.dataset.gruppo;
@@ -832,28 +898,28 @@ function selEsFromEl(el) {
     if(!es.nomi_circuito.includes(nome)) es.nomi_circuito.push(nome);
     es.nome = es.nomi_circuito.join(', ');
   } else {
-    // Tipo normale: supporta più esercizi, il primo dà nome e gif
     if(!es.nomi_normali) es.nomi_normali = [];
     if(!es.nomi_normali.includes(nome)) {
       es.nomi_normali.push(nome);
-      // Salva il gruppo del primo elemento per la gif
+      // gif segue il primo esercizio della lista
       if(es.nomi_normali.length === 1) {
         es._gifGruppo0 = gruppo;
         es.gif_file = gifPath(nome, gruppo);
       }
     }
-    es.nome = es.nomi_normali[0] || nome; // il nome principale è il primo
+    // FIX: es.nome contiene TUTTI i nomi, non solo il primo
+    es.nome = es.nomi_normali.join(', ');
   }
   document.getElementById(`sr-${g}-${i}`)?.classList.remove('open');
   document.getElementById(`si-${g}-${i}`).value = '';
   renderEsPanel();
 }
- 
+
 document.addEventListener('click', e => {
   if(!e.target.closest('.search-wrap') && !e.target.closest('.search-results'))
     document.querySelectorAll('.search-results').forEach(r => r.classList.remove('open'));
 });
- 
+
 // ══════════════════════════════════════════════════
 // BUILD JSON
 // ══════════════════════════════════════════════════
@@ -869,21 +935,22 @@ function buildJSON_internal() {
           ? es.nomi_circuito.join(', ')
           : (es.nome || 'ESERCIZIO');
       } else {
-        // Per normale: se ci sono più esercizi in nomi_normali, il nome è il primo
+        // FIX: salva TUTTI i nomi per esercizi normali
         nomeOut = (es.nomi_normali && es.nomi_normali.length)
-          ? es.nomi_normali[0]
+          ? es.nomi_normali.join(', ')
           : (es.nome || 'ESERCIZIO');
       }
       const o = {tipo: es.tipo||'normale', nome: nomeOut, serie: es.serie||4, reps: es.reps||'12', recupero_sec: es.recupero_sec||90};
       if(es.tipo === 'circuito') o.tempo_lavoro_sec = es.tempo_lavoro_sec || 30;
       if(es.note) o.note = es.note;
-      if(es.gif_file && es.tipo !== 'circuito') o.gif_file = es.gif_file;
+      // FIX: salva gif_file sempre se presente (rimuovi il controllo tipo)
+      if(es.gif_file) o.gif_file = es.gif_file;
       return o;
     });
     scheda.giorni.push({id_giorno: i+1, titolo, esercizi});
   }
 }
- 
+
 // ══════════════════════════════════════════════════
 // STEP 5 — RIEPILOGO
 // ══════════════════════════════════════════════════
@@ -897,30 +964,33 @@ function renderSummary() {
     h += `<div class="summary-card"><div class="summary-day-title">G${i+1} — ${g.titolo}</div>`;
     if(!g.esercizi.length) h += `<div style="font-size:.8rem;color:var(--muted)">Nessun esercizio</div>`;
     else g.esercizi.forEach(es => {
+      // FIX: nel summary mostra tutti i nomi (separati da virgola, già in es.nome)
+      const nomiDisplay = es.nome || '';
       h += `<div class="summary-es"><div class="${es.tipo==='circuito'?'dot-g':'dot-v'}"></div>
-      <span>${es.nome}</span><span style="margin-left:auto;font-size:.75rem;color:var(--muted)">${es.serie}×${es.reps}</span></div>`;
+      <span style="flex:1;word-break:break-word">${nomiDisplay}</span><span style="margin-left:8px;flex-shrink:0;font-size:.75rem;color:var(--muted)">${es.serie}×${es.reps}</span></div>`;
     });
     h += `</div>`;
   });
   document.getElementById('summary').innerHTML = h;
 }
- 
+
 // ══════════════════════════════════════════════════
 // BLE
 // ══════════════════════════════════════════════════
 const SVC = '12345678-1234-1234-1234-123456789abc';
 const RXC = '12345678-1234-1234-1234-123456789abd';
 const STC = '12345678-1234-1234-1234-123456789abe';
+const GFC = '12345678-1234-1234-1234-123456789abf';
 const CSZ = 200;
-let bDev = null, bRx = null, bSt = null, bConn = false;
- 
+let bDev = null, bRx = null, bSt = null, bGif = null, bConn = false;
+
 function bLog(m, t='') {
   const l = document.getElementById('ble-log');
   const d = document.createElement('div'); d.className = t;
   d.textContent = `[${new Date().toLocaleTimeString()}] ${m}`;
   l.appendChild(d); l.scrollTop = l.scrollHeight;
 }
- 
+
 async function bleConnect() {
   if(!navigator.bluetooth) { bLog('Web Bluetooth non disponibile. Usa Chrome su Android.','err'); return; }
   try {
@@ -931,6 +1001,7 @@ async function bleConnect() {
     const svc = await srv.getPrimaryService(SVC);
     bRx = await svc.getCharacteristic(RXC);
     bSt = await svc.getCharacteristic(STC);
+    bGif = await svc.getCharacteristic(GFC);
     await bSt.startNotifications();
     bSt.addEventListener('characteristicvaluechanged', e => {
       const v = new TextDecoder().decode(e.target.value);
@@ -945,9 +1016,9 @@ async function bleConnect() {
     bLog('Connesso a ' + bDev.name, 'ok');
   } catch(e) { bLog('Errore: ' + e.message, 'err'); }
 }
- 
+
 function onDisc() {
-  bConn = false; bRx = null; bSt = null;
+  bConn = false; bRx = null; bSt = null; bGif = null;
   document.getElementById('ble-icon').textContent = '📡';
   document.getElementById('ble-label').textContent = 'DISCONNESSO';
   document.getElementById('btn-conn').style.display = 'block';
@@ -955,45 +1026,83 @@ function onDisc() {
   document.getElementById('btn-send').disabled = true;
   bLog('Dispositivo disconnesso.','err');
 }
- 
+
 function bleDisconnect() { if(bDev?.gatt.connected) bDev.gatt.disconnect(); }
- 
+
+// Helper: invia dati binari in chunk su caratteristica BLE
+async function inviaChunkBLE(char, data, label, pi) {
+  const n = Math.ceil(data.length / CSZ);
+  for(let i = 0; i < n; i++) {
+    await char.writeValueWithResponse(data.slice(i*CSZ, (i+1)*CSZ));
+    const p = Math.round(((i+1)/n)*100);
+    if(pi) pi.style.width = p + '%';
+    bLog(`${label} ${i+1}/${n} (${p}%)`,'');
+    await sleep(40);
+  }
+}
+
 async function bleInviaScheda() {
   if(!bConn || !bRx) { bLog('Non connesso!','err'); return; }
   buildJSON_internal();
   scaricaJSON();
   await sleep(300);
-  bLog('✅ Backup JSON scaricato automaticamente.','ok');
-  const bytes = new TextEncoder().encode(JSON.stringify(scheda));
-  const n = Math.ceil(bytes.length / CSZ);
-  bLog(`Invio ${bytes.length} byte in ${n} chunk...`,'info');
+  bLog('Backup JSON scaricato.','ok');
+
   const po = document.getElementById('prog-outer'), pi = document.getElementById('prog-inner');
   po.classList.add('show'); pi.style.width = '0%';
+
+  // 1. Invia JSON
   try {
+    const bytes = new TextEncoder().encode(JSON.stringify(scheda, null, 2));
+    bLog('Invio JSON: ' + bytes.length + ' byte...','info');
     await bRx.writeValueWithResponse(new TextEncoder().encode('BEGIN'));
     bLog('BEGIN inviato','info'); await sleep(100);
-    for(let i = 0; i < n; i++) {
-      await bRx.writeValueWithResponse(bytes.slice(i*CSZ, (i+1)*CSZ));
-      const p = Math.round(((i+1)/n)*100);
-      pi.style.width = p + '%';
-      bLog(`Chunk ${i+1}/${n} (${p}%)`,'');
-      await sleep(50);
-    }
+    await inviaChunkBLE(bRx, bytes, 'JSON chunk', pi);
     await bRx.writeValueWithResponse(new TextEncoder().encode('END'));
-    bLog('END inviato — attendo conferma...','info');
-    setTimeout(() => po.classList.remove('show'), 3000);
-  } catch(e) { bLog('Errore invio: ' + e.message,'err'); po.classList.remove('show'); }
+    bLog('END JSON - attendo conferma...','info');
+    await sleep(600);
+  } catch(e) { bLog('Errore JSON: ' + e.message,'err'); po.classList.remove('show'); return; }
+
+  // 2. Invia GIF
+  if(!bGif) { bLog('Canale GIF non disponibile.','err'); po.classList.remove('show'); return; }
+
+  const gifQueue = [];
+  for(let g = 0; g < esState.length; g++)
+    for(let i = 0; i < esState[g].length; i++) {
+      const es = esState[g][i];
+      if(es._gifFile && es.gif_file) gifQueue.push({file: es._gifFile, path: es.gif_file});
+    }
+
+  if(gifQueue.length === 0) {
+    bLog('Nessuna GIF da inviare.','info');
+  } else {
+    bLog('Invio ' + gifQueue.length + ' GIF...','info');
+    for(const g of gifQueue) {
+      try {
+        const bytes = new Uint8Array(await g.file.arrayBuffer());
+        bLog('GIF: ' + g.path + ' (' + bytes.length + ' byte)','info');
+        pi.style.width = '0%';
+        await bGif.writeValueWithResponse(new TextEncoder().encode('GIF_BEGIN:' + g.path));
+        await sleep(200);
+        await inviaChunkBLE(bGif, bytes, 'GIF chunk', pi);
+        await bGif.writeValueWithResponse(new TextEncoder().encode('GIF_END'));
+        bLog('GIF salvata: ' + g.path,'ok');
+        await sleep(300);
+      } catch(err) { bLog('Errore GIF ' + g.path + ': ' + err.message,'err'); }
+    }
+  }
+
+  setTimeout(() => po.classList.remove('show'), 2000);
 }
- 
 function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
- 
+
 function scaricaJSON() {
   buildJSON_internal();
   const a = document.createElement('a');
   a.href = URL.createObjectURL(new Blob([JSON.stringify(scheda, null, 2)], {type:'application/json'}));
   a.download = 'workout.json'; a.click();
 }
- 
+
 function caricaJSON(e) {
   const f = e.target.files[0]; if(!f) return;
   const r = new FileReader();
@@ -1003,7 +1112,7 @@ function caricaJSON(e) {
   };
   r.readAsText(f);
 }
- 
+
 // INIT
 upd();
 if(!navigator.bluetooth) setTimeout(() => bLog('⚠️ Web Bluetooth non supportato. Usa Chrome su Android.','err'), 500);
