@@ -714,7 +714,7 @@ function buildEsCard(g, i, es) {
       ${circ?`<div class="field"><label>Tempo Lavoro per esercizio (sec)</label>
         <input type="number" min="1" max="300" value="${es.tempo_lavoro_sec||30}" oninput="setF(${g},${i},'tempo_lavoro_sec',parseInt(this.value)||30)">
       </div>`:''}
-      ${!circ?`<div class="field">
+      <div class="field">
         <label>GIF personalizzata (opzionale)</label>
         <div style="background:#0a0a0a;border:1px solid var(--border);border-radius:8px;padding:10px 12px;font-size:.78rem;color:var(--muted2);line-height:1.6;margin-bottom:8px">
           📐 <strong style="color:var(--text)">Requisiti:</strong> ~100×100px, sfondo nero<br>
@@ -741,7 +741,7 @@ function buildEsCard(g, i, es) {
           <input type="text" value="${es.gif_file||''}" placeholder="/gifs/Pettorali/nome_esercizio.gif"
             oninput="setF(${g},${i},'gif_file',this.value);aggiornaGifHint(${g},${i},this.value)">
         </div>
-      </div>`:''}
+      </div>
       <div class="field"><label>Note (opzionale)</label>
         <textarea placeholder="Indicazioni tecniche, peso..." oninput="setF(${g},${i},'note',this.value)">${es.note||''}</textarea>
       </div>
