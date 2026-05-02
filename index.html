@@ -754,27 +754,47 @@ function caricaGifPreview(g, i, input) {
   if(!f) return;
 
   const es = esState[g][i];
+  const circ = es.tipo === 'circuito';
   
-  // Recupera il nome dell'esercizio (il primo se ce ne sono multipli)
-  const nomeEsercizio = es.nomi_normali && es.nomi_normali.length > 0 
-    ? es.nomi_normali[0] 
-    : (es.nome || 'esercizio_custom');
+  let slug, gruppo, percorsoFinalizzato;
 
-  // Genera lo slug standardizzato (lowercase, senza accenti, spazi -> underscore)
-  const slug = nomeEsercizio.toLowerCase()
-    .replace(/[àáâ]/g,'a').replace(/[èéê]/g,'e').replace(/[ìí]/g,'i')
-    .replace(/[òó]/g,'o').replace(/[ùú]/g,'u')
-    .replace(/[^a-z0-9]/g,'_') // Sostituisce tutto ciò che non è alfanumerico con _
-    .replace(/_+/g,'_')        // Evita underscore multipli (es. __)
-    .replace(/^_|_$/g,'');     // Rimuove underscore all'inizio o alla fine
+  if(circ) {
+    // CIRCUITO: concatena tutti i nomi con underscore
+    const nomi = es.nomi_circuito || [];
+    if(!nomi.length) { alert('Aggiungi prima gli esercizi al circuito!'); return; }
 
-  // Determina il gruppo muscolare per la cartella
-  const trovato = ALL_ES.find(e => e.nome === es.nomi_normali[0]);
-  const gruppo = trovato ? trovato.gruppo : 'Custom';
-  
-  // Forza il percorso basato sul nome dell'esercizio, ignorando il nome file originale
-  const percorsoFinalizzato = `/gifs/${gruppo}/${slug}.gif`;
-  
+    // Genera slug per ogni nome e li unisce
+    slug = nomi.map(n =>
+      n.toLowerCase()
+        .replace(/[àáâ]/g,'a').replace(/[èéê]/g,'e').replace(/[ìí]/g,'i')
+        .replace(/[òó]/g,'o').replace(/[ùú]/g,'u')
+        .replace(/[^a-z0-9]/g,'_')
+        .replace(/_+/g,'_')
+        .replace(/^_|_$/g,'')
+    ).join('_');
+
+    // Cerca il gruppo del primo esercizio
+    const trovato = ALL_ES.find(e => e.nome === nomi[0]);
+    gruppo = trovato ? trovato.gruppo : 'Custom';
+    percorsoFinalizzato = `/gifs/${gruppo}/${slug}.gif`;
+
+  } else {
+    // NORMALE: usa il primo nome della lista
+    const nomi = es.nomi_normali || [];
+    const nomeEsercizio = nomi.length > 0 ? nomi[0] : (es.nome || 'esercizio_custom');
+
+    slug = nomeEsercizio.toLowerCase()
+      .replace(/[àáâ]/g,'a').replace(/[èéê]/g,'e').replace(/[ìí]/g,'i')
+      .replace(/[òó]/g,'o').replace(/[ùú]/g,'u')
+      .replace(/[^a-z0-9]/g,'_')
+      .replace(/_+/g,'_')
+      .replace(/^_|_$/g,'');
+
+    const trovato = ALL_ES.find(e => e.nome === nomeEsercizio);
+    gruppo = trovato ? trovato.gruppo : 'Custom';
+    percorsoFinalizzato = `/gifs/${gruppo}/${slug}.gif`;
+  }
+
   es.gif_file = percorsoFinalizzato;
   esState[g][i]._gifFile = f;
 
