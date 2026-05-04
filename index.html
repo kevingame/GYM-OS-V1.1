@@ -503,7 +503,7 @@ function caricaJSONStep1(ev) {
             recupero_sec: es.recupero_sec || 90,
             tempo_lavoro_sec: es.tempo_lavoro_sec || 30,
             note: es.note || '',
-            gif_file: es.gif_file || '',
+            gif_file: (es.gif_file || '').replace(/^\/gifs\//i, 'gifs/'),
             _gifCustom: gifCustom,  // ← aggiunto
             nomi_circuito: es.tipo === 'circuito' ? nomiArr : [],
             nomi_normali: es.tipo !== 'circuito' ? nomiArr : [],
