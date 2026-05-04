@@ -1,0 +1,1187 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>GymOS — Crea Scheda</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--gold:#DAA520;--gold2:#F5C842;--green:#00CC66;--red:#FF3333;--bg:#080808;--card:#141414;--card2:#1c1c1c;--border:#2a2a2a;--text:#f0f0f0;--muted:#666;--muted2:#999}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;overflow:hidden}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;display:flex;flex-direction:column}
+header{background:#0d0d0d;border-bottom:1px solid var(--border);padding:0 20px;height:52px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;position:relative;z-index:10}
+.logo{font-family:'Bebas Neue',sans-serif;font-size:1.5rem;letter-spacing:3px;color:var(--gold)}
+.logo span{color:var(--text);opacity:.4}
+.steps{display:flex;align-items:center;gap:6px;position:absolute;left:50%;transform:translateX(-50%)}
+.step-dot{width:8px;height:8px;border-radius:50%;background:var(--border);transition:all .3s}
+.step-dot.active{background:var(--gold);width:20px;border-radius:4px}
+.step-dot.done{background:var(--green)}
+main{flex:1;overflow-y:auto;overflow-x:hidden;padding:0 0 100px}
+main::-webkit-scrollbar{width:3px}
+main::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+.screen{display:none;animation:fadeUp .35s ease}
+.screen.active{display:block}
+@keyframes fadeUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+.hero{min-height:calc(100vh - 52px - 80px);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 24px;text-align:center}
+.hero-title{font-family:'Bebas Neue',sans-serif;font-size:3rem;letter-spacing:4px;line-height:1;margin-bottom:8px;background:linear-gradient(135deg,var(--gold),var(--gold2));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.hero-sub{font-size:.9rem;color:var(--muted2);margin-bottom:40px;letter-spacing:.5px}
+.big-input{background:transparent;border:none;border-bottom:2px solid var(--gold);color:var(--text);font-family:'Bebas Neue',sans-serif;font-size:2.2rem;letter-spacing:3px;text-align:center;width:100%;max-width:300px;outline:none;padding:8px 0;caret-color:var(--gold)}
+.big-input::placeholder{color:var(--muted)}
+.load-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px 20px;margin-top:28px;width:100%;max-width:340px;text-align:left}
+.load-card-title{font-family:'Bebas Neue',sans-serif;font-size:.85rem;letter-spacing:3px;color:var(--muted2);margin-bottom:8px}
+.load-card-info{font-size:.82rem;color:var(--muted2);margin-bottom:12px;min-height:18px}
+.section-wrap{padding:24px 20px 0}
+.section-tag{font-family:'Bebas Neue',sans-serif;font-size:.85rem;letter-spacing:3px;color:var(--gold);margin-bottom:6px}
+.section-title{font-size:1.4rem;font-weight:600;margin-bottom:4px}
+.section-sub{font-size:.82rem;color:var(--muted2);margin-bottom:20px}
+.day-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(90px,1fr));gap:12px;padding:0 20px}
+.day-btn{aspect-ratio:1;border-radius:12px;background:var(--card);border:2px solid var(--border);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;transition:all .2s;font-family:'Bebas Neue',sans-serif}
+.day-btn .num{font-size:2.2rem;color:var(--muted);line-height:1}
+.day-btn .label{font-size:.65rem;letter-spacing:2px;color:var(--muted);margin-top:2px}
+.day-btn.selected{border-color:var(--gold);background:#1a1500}
+.day-btn.selected .num,.day-btn.selected .label{color:var(--gold)}
+.day-btn:active{transform:scale(.96)}
+.muscoli-grid{display:flex;flex-wrap:wrap;gap:8px;padding:0 20px}
+.muscolo-chip{padding:8px 16px;border-radius:24px;background:var(--card);border:1px solid var(--border);font-size:.82rem;font-weight:500;cursor:pointer;transition:all .2s;user-select:none}
+.muscolo-chip.selected{background:#1a1500;border-color:var(--gold);color:var(--gold)}
+.giorno-tabs{display:flex;gap:0;overflow-x:auto;padding:0 20px;border-bottom:1px solid var(--border);scrollbar-width:none}
+.giorno-tabs::-webkit-scrollbar{display:none}
+.gtab{flex-shrink:0;padding:10px 18px;font-size:.8rem;letter-spacing:1px;font-family:'Bebas Neue',sans-serif;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;transition:all .2s}
+.gtab.active{color:var(--gold);border-bottom-color:var(--gold)}
+.es-wrap{padding:0 20px}
+.es-card{background:var(--card);border:1px solid var(--border);border-radius:12px;margin-bottom:10px;overflow:hidden;transition:border-color .2s}
+.es-card.open{border-color:var(--gold)}
+.es-card-header{display:flex;align-items:center;padding:10px 10px;cursor:pointer;gap:4px}
+.es-num{font-family:'Bebas Neue',sans-serif;font-size:.75rem;letter-spacing:2px;color:var(--muted);margin-right:4px;flex-shrink:0}
+.es-name-preview{font-size:.85rem;font-weight:500;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.es-tipo-pill{font-size:.65rem;letter-spacing:1.5px;font-family:'Bebas Neue',sans-serif;padding:3px 6px;border-radius:4px;flex-shrink:0}
+.pill-normale{background:#0d1f0d;color:var(--green);border:1px solid #1a3a1a}
+.pill-circuito{background:#1f1400;color:var(--gold);border:1px solid #3a2a00}
+.es-card-body{padding:0 14px 14px;display:none}
+.es-card.open .es-card-body{display:block}
+.field{margin-top:12px}
+.field label{font-size:.7rem;letter-spacing:1.5px;color:var(--muted);text-transform:uppercase;display:block;margin-bottom:5px}
+.field input,.field select,.field textarea{width:100%;background:#0e0e0e;border:1px solid var(--border);border-radius:8px;color:var(--text);padding:10px 12px;font-size:.9rem;font-family:'DM Sans',sans-serif;outline:none;transition:border-color .2s;-webkit-appearance:none}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--gold)}
+.field select option{background:#141414}
+.field textarea{resize:none;height:70px;line-height:1.5}
+.row-fields-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.search-wrap{position:relative;margin-bottom:8px}
+.search-input{width:100%;background:#0e0e0e;border:1px solid var(--border);border-radius:8px;color:var(--text);padding:10px 12px 10px 36px;font-size:.9rem;outline:none;transition:border-color .2s;font-family:'DM Sans',sans-serif}
+.search-input:focus{border-color:var(--gold)}
+.search-icon{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--muted);pointer-events:none}
+.search-results{background:#0e0e0e;border:1px solid var(--border);border-radius:8px;max-height:180px;overflow-y:auto;display:none}
+.search-results.open{display:block}
+.search-item{padding:10px 12px;font-size:.88rem;cursor:pointer;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.search-item:last-child{border-bottom:none}
+.search-item:active{background:var(--card2)}
+.search-item .es-gruppo{font-size:.68rem;color:var(--muted);letter-spacing:1px;flex-shrink:0;margin-left:8px}
+.tipo-toggle{display:flex;gap:8px;margin-top:5px}
+.tipo-opt{flex:1;padding:9px;border-radius:7px;text-align:center;border:1px solid var(--border);cursor:pointer;font-size:.8rem;font-weight:500;transition:all .2s;background:var(--card);color:var(--muted2)}
+.tipo-opt.active-normale{background:#0d1f0d;border-color:var(--green);color:var(--green)}
+.tipo-opt.active-circuito{background:#1f1400;border-color:var(--gold);color:var(--gold)}
+.circ-tags{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:6px;min-height:10px}
+.circ-tag{display:inline-flex;align-items:center;gap:5px;background:#1f1400;border:1px solid #3a2a00;border-radius:6px;padding:4px 10px;font-size:.78rem;color:var(--gold)}
+.circ-tag button{background:none;border:none;color:#cc8800;cursor:pointer;font-size:1rem;line-height:1;padding:0;margin-left:2px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:12px 20px;border-radius:10px;border:none;cursor:pointer;font-size:.88rem;font-weight:600;font-family:'DM Sans',sans-serif;transition:all .2s}
+.btn:active{transform:scale(.97)}
+.btn:disabled{opacity:.3;cursor:not-allowed;pointer-events:none}
+.btn-gold{background:var(--gold);color:#000}
+.btn-green{background:var(--green);color:#000}
+.btn-gray{background:var(--card2);color:var(--text);border:1px solid var(--border)}
+.btn-ghost{background:transparent;color:var(--muted2);border:1px solid var(--border)}
+.btn-red{background:#2a0000;color:var(--red);border:1px solid #5a0000}
+.btn-sm{padding:6px 10px;font-size:.75rem;border-radius:7px}
+.bottom-bar{position:fixed;bottom:0;left:0;right:0;background:#0d0d0d;border-top:1px solid var(--border);padding:12px 20px;display:flex;gap:10px;z-index:10}
+.btn-back{width:52px;flex-shrink:0;padding:0}
+.btn-next{flex:1}
+.summary-card{background:var(--card);border:1px solid var(--border);border-radius:12px;margin:0 20px 12px;padding:16px}
+.summary-day-title{font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:2px;color:var(--gold);margin-bottom:10px}
+.summary-es{padding:6px 0;border-bottom:1px solid var(--border);font-size:.85rem;display:flex;align-items:center;gap:8px}
+.summary-es:last-child{border-bottom:none}
+.dot-v{width:6px;height:6px;border-radius:50%;background:var(--green);flex-shrink:0}
+.dot-g{width:6px;height:6px;border-radius:50%;background:var(--gold);flex-shrink:0}
+.ble-big{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 24px;text-align:center;gap:16px}
+.ble-icon{font-size:3rem}
+.ble-label{font-family:'Bebas Neue',sans-serif;font-size:1.2rem;letter-spacing:3px;color:var(--muted2)}
+.prog-outer{width:100%;background:var(--border);border-radius:10px;height:6px;margin:4px 0;overflow:hidden;display:none}
+.prog-outer.show{display:block}
+.prog-inner{height:100%;background:var(--gold);border-radius:10px;width:0;transition:width .3s}
+.ble-log{margin:0 20px;background:#0a0a0a;border:1px solid var(--border);border-radius:8px;padding:10px 12px;font-size:.72rem;font-family:monospace;color:var(--muted);max-height:140px;overflow-y:auto}
+.ble-log .ok{color:var(--green)}.ble-log .err{color:var(--red)}.ble-log .info{color:var(--gold)}
+.add-btn-wrap{padding:0 20px;margin-top:6px}
+.btn-move{background:var(--card2);color:var(--muted2);border:1px solid var(--border);padding:4px 8px;font-size:.8rem;border-radius:6px;cursor:pointer;line-height:1;flex-shrink:0}
+.btn-move:disabled{opacity:.25;cursor:not-allowed}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">GYM<span>OS</span></div>
+  <div class="steps" id="steps-ind"></div>
+  <div style="width:60px"></div>
+</header>
+<main id="ms">
+
+<!-- STEP 1 -->
+<div class="screen active" id="screen-1">
+  <div class="hero">
+    <div class="hero-title">CIAO,<br>BENVENUTO!</div>
+    <div class="hero-sub">CREIAMO LA TUA SCHEDA PERSONALIZZATA</div>
+    <input class="big-input" type="text" id="input-nome" placeholder="IL TUO NOME" maxlength="24" autocomplete="off">
+    <div class="load-card">
+      <div class="load-card-title">📂 HAI GIÀ UNA SCHEDA?</div>
+      <div class="load-card-info" id="load-card-info">Carica il tuo workout.json per modificarlo</div>
+      <div style="display:flex;gap:8px">
+        <label class="btn btn-gray btn-sm" style="flex:1;cursor:pointer">
+          Carica JSON
+          <input type="file" accept=".json,application/json" style="display:none" onchange="caricaJSONStep1(event)">
+        </label>
+        <button class="btn btn-red btn-sm" id="btn-clear-json" style="display:none" onclick="clearJSON()">✕ Rimuovi</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- STEP 2 -->
+<div class="screen" id="screen-2">
+  <div class="section-wrap">
+    <div class="section-tag">STEP 2</div>
+    <div class="section-title">Quanti giorni ti alleni?</div>
+    <div class="section-sub">Seleziona il numero di sessioni settimanali</div>
+  </div>
+  <div class="day-grid">
+    <div class="day-btn" onclick="selGiorni(1)"><div class="num">1</div><div class="label">GIORNO</div></div>
+    <div class="day-btn" onclick="selGiorni(2)"><div class="num">2</div><div class="label">GIORNI</div></div>
+    <div class="day-btn" onclick="selGiorni(3)"><div class="num">3</div><div class="label">GIORNI</div></div>
+    <div class="day-btn" onclick="selGiorni(4)"><div class="num">4</div><div class="label">GIORNI</div></div>
+    <div class="day-btn" onclick="selGiorni(5)"><div class="num">5</div><div class="label">GIORNI</div></div>
+    <div class="day-btn" onclick="selGiorni(6)"><div class="num">6</div><div class="label">GIORNI</div></div>
+    <div class="day-btn" onclick="selGiorni(7)"><div class="num">7</div><div class="label">GIORNI</div></div>
+  </div>
+</div>
+
+<!-- STEP 3 -->
+<div class="screen" id="screen-3">
+  <div class="section-wrap">
+    <div class="section-tag">STEP 3</div>
+    <div class="section-title">Muscoli per giorno</div>
+    <div class="section-sub">Seleziona i gruppi per ogni sessione</div>
+  </div>
+  <div class="giorno-tabs" id="musc-tabs"></div>
+  <div style="padding:16px 20px 0" id="musc-panel"></div>
+</div>
+
+<!-- STEP 4 -->
+<div class="screen" id="screen-4">
+  <div class="section-wrap">
+    <div class="section-tag">STEP 4</div>
+    <div class="section-title">Esercizi</div>
+    <div class="section-sub">Costruisci la tua routine giorno per giorno</div>
+  </div>
+  <div class="giorno-tabs" id="es-tabs"></div>
+  <div id="es-panel" style="padding-top:16px"></div>
+</div>
+
+<!-- STEP 5 -->
+<div class="screen" id="screen-5">
+  <div class="section-wrap">
+    <div class="section-tag">STEP 5</div>
+    <div class="section-title">Riepilogo Scheda</div>
+    <div class="section-sub">Controlla prima di inviare</div>
+  </div>
+  <div id="summary" style="margin-top:16px"></div>
+</div>
+
+<!-- STEP 6 -->
+<div class="screen" id="screen-6">
+  <div class="section-wrap">
+    <div class="section-tag">STEP 6</div>
+    <div class="section-title">Invia al dispositivo</div>
+    <div class="section-sub">Connetti GymOS via Bluetooth</div>
+  </div>
+  <div class="ble-big">
+    <div class="ble-icon" id="ble-icon">📡</div>
+    <div class="ble-label" id="ble-label">NON CONNESSO</div>
+    <button class="btn btn-gold" id="btn-conn" onclick="bleConnect()" style="width:100%;max-width:280px">Connetti a GymOS</button>
+    <button class="btn btn-ghost btn-sm" id="btn-disc" onclick="bleDisconnect()" style="display:none">Disconnetti</button>
+  </div>
+  <div style="padding:0 20px 12px">
+    <div class="prog-outer" id="prog-outer"><div class="prog-inner" id="prog-inner"></div></div>
+    <button class="btn btn-green" id="btn-send" onclick="bleInviaScheda()" disabled style="width:100%;margin-top:10px">📤 Invia Scheda</button>
+  </div>
+  <div style="padding:0 20px;margin-bottom:8px;font-size:.7rem;letter-spacing:1.5px;color:var(--muted)">LOG</div>
+  <div class="ble-log" id="ble-log"><span class="info">In attesa di connessione...</span></div>
+  <div style="padding:0 20px;margin-top:16px;display:flex;gap:10px">
+    <button class="btn btn-gray" style="flex:1" onclick="scaricaJSON()">💾 Salva JSON</button>
+    <label class="btn btn-gray" style="flex:1;cursor:pointer">📂 Carica JSON<input type="file" accept=".json,application/json" style="display:none" onchange="caricaJSON(event)"></label>
+  </div>
+</div>
+
+</main>
+<div class="bottom-bar">
+  <button class="btn btn-ghost btn-back" id="btn-back" onclick="stepBack()" style="width:52px">←</button>
+  <button class="btn btn-gold btn-next" id="btn-next" onclick="stepNext()">Avanti →</button>
+</div>
+
+<script>
+const DB = {
+  Pettorali:["Croce ai cavi alti e bassi per il petto","Flessione del Polso Inversa","Distensione con bilanciere su pavimento","Distensione dei pettorali bassi al cavo in piedi","Distensione su Panca Inclinata con Bilanciere","Piegamento in stile Superman","Dip Coreano","Panca Inclinata con Cavi Bassi","Distensione dei pettorali al cavo in piedi","Flessione sulle nocche","Cavo Inginocchiato Croce Alta-Bassa","Croce ai Cavi con un Braccio","Flessione a Terra con Salto","Boxe con Sacco da Allenamento","Dip in Planche","Flessione Profonda su Parallele","Croce con Manubri su Panca Inclinata Bassa","Piegamento su Braccio Singolo","Dips alla Sbarra Diritta","Push-Up Scapolare","Croce Bassa con Manubrio a un Braccio","Distensione con manubri a presa stretta","Croce ai cavi per il petto medio","Pressa di Svend","Distensione con manubri su pavimento","Flessione su Panca Inclinata Negativa","Pressa su panca con bilanciere guidato","Pressa Larsen con manubri","Push-Up Negativo","Panca Inclinata con Manubri","Apertura su panca con manubri","Pullover con bilanciere","Apertura su Pec Deck","Distensione su panca con manubri a presa neutra","Pressa Poliquin con manubri","Distensione su panca declinata con bilanciere","Piegamento sulle Braccia","Croce ai cavi da seduto","Distensione su panca con fascia elastica","Distensione con manubri su panca inclinata a presa neutra","Flessione sulle braccia in ginocchio con anelli","Apertura con Elastico per Pettorali","Distensione su panca declinata con cavi","Aperture al petto in sospensione","Pressa Spoto","Distensione su Panca con Bilanciere e Catene","Distensione su panca inclinata con manubrio a un braccio","Pressa Larsen con bilanciere","Croce con Manubri su Panca Inclinata","Pressa Pettorale su Macchina","Distensione su panca declinata","Croce su panca con cavi","Flessione con Fascia di Resistenza","Piegamento con Battito di Mani","Croce ai Cavi con Elastico in Inclinazione","Croce ai cavi unilaterale dall'alto verso il basso","Piegamento a Freccia","Distensione su panca con manubri","Pressa su Panca Inclinata con Manubri a Presa Neutra","Pressa di forza con un braccio incrociato sul corpo","Dip per il petto","Distensione a terra con kettlebell a un braccio","Pressa in Piedi con Rotazione","Distensione su panca piana con bilanciere","Tocco della Spalla","Distensione su panca con cavo da seduti","Flessione su anelli","Distensione su panca con manubrio a un braccio","Flessione a Terra in Ginocchio con Presa Larga","Distensione su Panca Inclinata Negativa con Manubri","Piegamenti sulle Braccia a Presa Larga","Flessione sulle parallele","Distensione su Panca con Fascia di Resistenza","Panca Piana con Fermata","Croce ai cavi unilaterale dal basso verso l'alto","Pressa per Pettorali con Impugnatura a Martello","Pressa su Panca Inclinata Negativa con Smith Machine","Apertura su Macchina per Pettorali","Pressa per il Petto su Macchina","Panca con bilanciere","Apertura con manubri dal basso verso l'alto","Flessione delle braccia con appoggio sulle ginocchia","Flessione sulle Dita","Aperture con Manubri su Panca Inclinata Negativa","Pressa su Panca Inclinata con Smith Machine","Flessione su Panca Inclinata","Distensione su panca con cavi","Piegamenti sulle braccia con sovraccarico","Apertura con manubri su panca piana","Aperture Poliquin","Piegamento Profondo con Manubri","Croci ai Cavi su Panca Inclinata","Planche inclinato"],
+  Schiena:["Lat Pulldown con un Braccio","Trazione alla sbarra","Trazione alla sbarra con sovraccarico","Rematore con manubrio a un braccio in flessione del busto con attivazione della scapola","Trazione alla sbarra a presa stretta","Rematore con Bilanciere Piegato in Avanti","Remata Bassa al Cavo con un Braccio","Remata al cavo da seduti con presa larga","Rematore al cavo da seduto","Trazioni al cavo con braccia tese","Lat Machine con Presa Larga Dietro al Collo","Trazione alla sbarra con presa larga posteriore","Trazione alla sbarra con presa inversa","Trazione alla Sbarra Presa Larga","Rematore in Sospensione","Rematore con Bilanciere da Pin in Piegamento Avanti","Lat Pulldown con Cavo a Braccio Singolo e Braccio Dritto","Scrollate Kelso con Manubri","Macchina per Rematore con Supporto Toracico a un Braccio","Lat Machine con Presa Neutra","Remata Seduta al Cavo Basso con un Braccio","Trazione alla sbarra con leva frontale","Lat Pulldown alla Corda","Rematore con Kettlebell a busto flesso","Scrollate alla macchina","Rematore con Presa Ampia su Panca Inclinata","Remata Gorilla","Lat Pulldown con Fascia in Piegamento Avanti","Rematore Inverso in Sospensione","Rematore con Bilanciere a T Inclinato","Rematore con Manubri su Panca Inclinata","Scrollata con bilanciere dietro la schiena","Rematore con manubri piegato in avanti","Pullover alla macchina","Remata con supporto toracico su barra a T","Lat machine con presa ampia al petto","Scrollate delle spalle con manubri","Trazione alla sbarra in posizione a L","Scrollate con manubri da seduti","Rematore con Bilanciere a Terra con un Braccio in Piegamento del Tronco","Lat Pulldown in Ginocchio con Cavo a un Braccio","Lat Pulldown in Ginocchio con Fascia a un Braccio","Trazioni Australiane Presa Inversa","Rematore alla macchina con presa bassa","Trazione alla sbarra presa neutra","Scrollata di Spalle alla Smith","Scrollate alla sbarra","Rematore alla macchina con supporto toracico","Trazione con Elastico Dietro il Collo","Trazione alla sbarra con anelli","Vogatore","Remata a terra con manubri","Remata Alternata in Plank","Remata Alta con Cavo a un Braccio","Lat Pulldown con Presa Stretta al Cavo","Scrollata di spalle con bilanciere","Rematore con Bilanciere a Presa Inversa Piegato in Avanti","Macchina per Lat Pulldown","Remata Ampia con Elastico ad Ancoraggio Alto","Lat Machine con Presa Inversa","Rematore con Bilanciere su Panca Inclinata con Supporto Toracico","Remata Renegade con Kettlebell","Trazione alla sbarra assistita","Rematore con Bilanciere per Deltoidi Posteriori","Rematore al cavo da seduto con presa neutra","Remata al cavo con un braccio","Rematore Alto alla Macchina","Scrollate con bilanciere esagonale","Rematore Inverso (Australiano)","Rematore Pendlay","Remata Bassa al Cavo da Seduti con Presa Neutra","Estensione della Schiena alla Macchina","Pullover con Manubri con Gambe Sollevate","Remata al cavo da seduto con presa supina","Lat Pulldown a Braccia Tese","Lat Machine con Impugnatura Neutra","Lat Pulldown con Cavo in Ginocchio","Trazioni Australiane con Presa Stretta su Anelli","Rematore con presa stretta alla landmine","Leveraggio Posteriore","Remata da seduto con un braccio","Scrollata ai cavi","Rematore con Bilanciere su Panca Inclinata a Presa Larga","Trazione alla Sbarra Assistita con Elastico","Scrollata Invertita","Pullover con manubrio","Sollevamenti Laterali con Manubri su Panca Inclinata con Supporto Toracico","Leveraggio Frontale","Rematore Alto a Braccio Singolo con Leva","Trazione alla sbarra negativa","Rematore con Bilanciere alla Smith Machine","Rematore Piegato con Due Manubri"],
+  Spalle:["Distensione delle spalle con bilanciere dietro il collo","Distensione con manubri","Pressa delle Spalle con Elastico","Sollevamento Frontale con Piastra","Cerchi con le Braccia","Sollevamento Frontale con Manubri","Sollevamento Frontale con Cavo","Sollevamento Laterale al Cavo con un Braccio","Sollevamento Laterale con Manubri da Seduto","Distensione con Bilanciere sopra la Testa","Pressa Cubana Seduta","Distensione delle Spalle con Manubrio a un Braccio","Sollevamento Frontale con Cavo a un Braccio","Sollevamento Laterale con Manubri a Bustopiegato","Distensione con bilanciere sopra la testa","Pressa Spalle Seduta con Impugnatura a Martello su Leva","Flessione a V tra panche","Rematore Verticale al Cavo","Sollevamento Laterale a Frontale","Sollevamento a T su panca inclinata con manubri","Tirata al viso con cavo in supinazione","Rotazione Cubana con Manubri","Tirata al Viso da Seduto","Distensione delle spalle con manubri in piedi","Tirata al Cavo da Sdraiato per il Viso","Tirata al viso con cavo","Rematore Verticale con Bilanciere a Presa Larga","Distensione delle spalle con manubri da seduto","Aperture Inverse alla Macchina","Pressa Spalle in Piedi con Bilanciere a Terra a un Braccio","Pressa Spalle con Manubri in Posizione Inginocchiata a Metà","Rematore Verticale con Presa Stretta con Bilanciere","Pressa Spalle alla Macchina","Rematore Verticale con Manubri","Croce Laterale con Cavi da Sdraiato","Slancio con Kettlebell","Sollevamento Frontale Alternato con Manubri a Martello","Piegamento a V Invertita","Tirata al Viso con Anelli","Pressa Dietro il Collo Seduto con Smith Machine","Sollevamento Powell Inclinato","Pressa Cubana in Piedi","Remata Verticale con Presa alla Spalla con Bilanciere","Apertura Inclinata con Manubrio a Braccio Singolo per Deltoidi Posteriori","Aperture Inverse ai Cavi per Deltoidi Posteriori","Rematore Alto con Manubri da Seduto Inclinato Avanti","Alzata Laterale con Cavo a Braccio Singolo in Piegamento","Sollevamento Frontale con Bilanciere","Pressa Arnold con Manubri da Seduto","Sollevamento Laterale con Elastico","Pressa Alternata in Piedi con Manubri","Sollevamento Laterale con Bilanciere a Terra","Tirata al viso con elastico","Piegamenti in verticale","Alternato Piegato in Avanti con Manubri Alzata Posteriore","Sollevamento Laterale con Manubrio a un Braccio Inclinato con Supporto","Sollevamento a Y su Panca Inclinata con Cavo e Supporto per la Schiena","Sollevamento Laterale con Manubri da Seduto Inclinato in Avanti","Sollevamento Laterale con Manubrio su Panca Inclinata a Un Braccio","Sollevamento Laterale ai Cavi","Sollevamento a Y per i trapezi","Remata Verticale con Elastico","Alzate laterali con manubri","Sollevamenti Laterali con Manubri","Sollevamento Laterale Poliquin con Manubri","Alzata Laterale Posteriore da Seduto con Cavi","Sollevamento Laterale Inclinato ai Cavi","Strappo con manubrio","Rematore Verticale alla Smith Machine","Sollevamento Laterale con Manubrio a un Braccio","Sollevamento a T Laterale con Supporto Toracico","Conduttore in Piedi con Manubri","Distensione sopra la testa con kettlebell a un braccio","Sollevamento Turco","Pressa con Spalla in Ginocchio a Mezzo con Bilanciere a Braccio Singolo","Pressa Spalle Seduta Presa Neutra","Pressa con Bilanciere a Terra","Sollevamento Frontale Alternato con Manubri","Sollevamento di Powell","Apertura Inversa al Cavo con un Braccio per Deltoidi Posteriori","Flessione Pike su Panca","Sollevamento Laterale alla Macchina","Rematore con Manubri per Deltoidi Posteriori","Sollevamento Laterale Posteriore con Manubri su Panca Inclinata","Pressa Spalle alla Smith Machine","Windmill con Kettlebell","Sollevamento a Y con cavi","Sollevamento con Bilanciere per Deltoidi Posteriori","Distensione delle spalle con bilanciere da seduto","Mantenimento in Verticale"],
+  Gambe:["Curling delle gambe su superficie scorrevole","Sollevamento del Tibiale in Piedi","Squat di Anderson","Squat a pistola","Squat Sissy con Peso","Pressa a 45 Gradi con Posizione Stretta dei Piedi","Sollevamento del Polpaccio con Bilanciere","Mezzo Squat","Stacco da terra con deficit","Sollevamento del Polpaccio Seduto con Peso","Squat alla Smith Machine con Sedia","Adduzione dell'anca da seduto","Squat con bilanciere","Squat con fermo ai pin","Pressa per i polpacci","Strappo","Bicicletta Stazionaria","Sollevamento da terra","Step-up con bilanciere","Sollevamento del Polpaccio su una Gamba con Manubrio","Squat con Bilanciere a Bassa Posizione","Squat alla macchina con cintura","Slancio con bilanciere","Squat con Bilanciere Alto","Salita su gradino con manubri","Affondo Bulgaro con Manubri","Squat Sumo con Bilanciere","Affondo Bulgaro con Piede Anteriore Sollevato","Pressa per le gambe a posizione larga","Leg curl da seduto","Curling Nordico dei Muscoli Posteriori della Coscia","Calcio Gluteo alla Smith Machine","Adduzione dell'anca con fascia elastica","Sollevamento del Polpaccio da Seduto","Squat con manubri","Curling delle gambe in piedi","Squat Bulgaro alla Smith Machine","Pressa a Gamba Singola","Salto con la Corda","Squat Frontale","Squat alla Smith Machine","Swing con Kettlebell a un Braccio","Stacco da Terra su una Gamba","Sollevamento del Polpaccio su una Gamba","Sollevamento del Polpaccio Rotatorio","Affondi in camminata con bilanciere","Salto con Manubri","Salti su Scatola","Squat Hack alla Smith Machine","Slancio da terra con bilanciere","Affondi in camminata","Squat Hack con Bilanciere","Accosciata","Squat Cossack con Manubri","Curl delle gambe con fascia da sdraiato","Affondi in camminata con manubri","Stacco da terra con bilanciere dal rack","Stacco da Terra a Gambe Tese con Bilanciere","Sollevamento del Polpaccio in Piedi","Slitta Prowler","Kickboxing","Sollevamenti dei Polpacci alla Smith Machine","Sollevamento da terra con bilanciere esagonale","Sedia a muro","Squat con manubrio","Affondi Laterali","Squat Diviso con Bilanciere","Affondo Bulgaro","Affondo Posteriore con Kettlebell","Squat a Calice con Manubrio","Squat Cossack con Sovraccarico","Affondi Laterali con Manubri","Squat Cossacco","Affondi Inversi con Bilanciere","Squat alla Pressa Orizzontale","Squat Sumo","Macchina per Estensione delle Gambe da Seduto","Affondo laterale pliometrico","Clean con Kettlebell","Curl Femore Unilaterale Seduto","Squat alla Smith con panca","Adduzione dell'anca al cavo","Stacco da Terra con Kettlebell","Sollevamenti dei polpacci in piedi con manubri","Squat con Bilanciere a Terra","Curling delle gambe con cavo a una gamba","Oscillazione con Kettlebell","Ellittica","Sollevamento del Polpaccio Seduto alla Smith Machine","Squat Inverso alla Hack Machine","Squat Pistol Assistito","Squat Frontale con Fermo","Step-Up con Manubri","Spinta dell'anca in ginocchio alla Smith Machine","Affondo Posteriore","Salto in Lungo","Squat con Pulizia","Squat Jump Bulgaro","Squat Frontale alla Smith Machine","Squat Zercher","Burpee","Squat Zercher alla Smith Machine","Curl delle gambe da prono","Salti Pogo","Salti con apertura delle braccia e delle gambe","Squat Cossack con Bilanciere","Squat su Scatola con Gamba Singola","Sollevamenti del Polpaccio alla Macchina","Affondo Posteriore alla Smith Machine","Squat al Muro con Palla di Stabilità","Pressa a Gambe Verticale con Smith Machine","Curling a gamba singola da sdraiato","Squat Sumo con Smith Machine","Pressa Orizzontale a Leva per le Gambe","Salto su Scatola a Gamba Singola","Squat Bulgaro con Manubri","Stacco con manubrio su una gamba","Squat Pistol con Sovraccarico","Curling delle gambe con fitball","Squat con Box","Slancio completo","Squat con Salto","Bicicletta ad Aria Assault","Sollevamento del Polpaccio Seduto su Una Gamba con Manubrio","Squat Sissy","Curl Nordico Inverso","Squat Frontale con Bilanciere su Panca","Stacco Rumeno con Cavi","Curl Jefferson","Pressa per le gambe","Squat del Ciclista","Stacco Rumeno a Posizione B","Curl delle gambe con manubri da sdraiato","Corsa su Tapis Roulant","Stacco Rumeno con Manubri","Squat Sumo su Stepbox","Affondi con manubri","Stacco Rumeno alla Smith Machine","Affondi","Step Up al Cavo","Stacco da terra con manubri","Estensione della Gamba Singola","Curling delle gambe con anelli","Estensione del Ginocchio al Cavo","Sollevamento del Polpaccio su Macchina Smith a Gamba Singola","Corsa","Squat con Bilanciere Sopra la Testa","Squat con Elastico","Squat Bulgaro con Bilanciere","Sollevamento del Polpaccio su Macchina Smith a Gamba Singola"],
+  Glutei:["Spinta dell'anca su una gamba con manubrio","Calcio Gluteo con Fascia di Resistenza in Ginocchio","Affondo Inverso con Manubri da Gradino","Abduzione dell'anca al cavo","Good Morning con Bilanciere","Ponte Gluteo con Mini Band","Good Morning alla Smith Machine","Abduzione dell'anca con fascia da seduti","Calcio dell'Asino","Affondo Bulgaro con Piede Anteriore Sollevato","Spinta dell'anca alla Smith Machine","Stacco Rumeno a Gamba Singola","Estensione della Schiena con Sovraccarico","Calcio Gluteo in Equilibrio in Piedi con Fascia","Affondo Posteriore con Bilanciere su Step","Sollevamento del Bacino","Plank Laterale con Abduzione dell'Anca","Ponte per i glutei","Estensione dell'anca al cavo","Ponte Gluteo con Peso","Abduzione dell'anca in posizione laterale sdraiata","Ponte Gluteo con Bilanciere","Stacco da terra sumo","Abduzione dell'anca in piedi","Estensione della Schiena","Affondo Posteriore con Manubri","Trazione al Cavo Passante","Calcio posteriore alla macchina per glutei","Ponte Gluteo KAS","Squat Sumo con Manubri","Ponte Gluteo su Panca","Ponte Gluteo Unilaterale con Peso","Inclinazione dell'anca","Estensione della Schiena con Manubrio","Stacco Rumeno","Squat con Kettlebell a Coppa","Abduzione dell'anca da seduti","Abduzione dell'anca con fascia elastica","Iperestensione Inversa con Fascia","Camminata Laterale con Elastico","Sollevamento del Bacino a Rana","Squat Bulgaro","Spinta dell'anca alla macchina","Plank Laterale con Conchiglia","Stacco da terra con rialzi","Conchiglie sdraiate con fascia","Good Morning da seduto","Cane da Caccia","Sollevamento del bacino con manubri","Ponte Gluteo a Gamba Singola"],
+  Bicipiti:["Curl con Elastico per Bicipiti","Curl Zottman","Curl con bilanciere EZ a presa stretta","Curl con cavo bayesiano","Curl con Bilanciere alla Cavo per Bicipiti","Curl con manubri su panca inclinata","Curl con manubri da seduto","Curl con Martello su Panca Inclinata","Curl con Manubrio Singolo","Curl con manubri su panca Scott con presa supina","Curl con Macchina Scott a Un Braccio","Curl con bilanciere EZ su panca Scott","Curl con manubri su panca Scott","Curl con manubri su panca inclinata a martello","Curl con cavo in posizione accovacciata","Curl con Cavo per Bicipiti a un Braccio","Curl con Bilanciere EZ per Bicipiti","Curl con Martello con Elastico","Curl con Bilanciere su Panca Inclinata Prona","Curl con manubri per bicipiti con Arm Blaster","Curl con manubri a martello","Curl con Bilanciere per Bicipiti","Curl alternato con manubri a presa supina","Curl con Cavo Seduto Bayesian","Curl con manubri a martello da seduto","Curl con Martello su Panca Scott a un Braccio","Curl con Bilanciere in Piedi a Presa Larga","Curl con manubri a trascinamento","Curl con manubri per bicipiti","Curl con manubri su panca inclinata con presa supina alternata","Curl Bicipiti alla Macchina","Curl con manubri in posizione eretta","Curl con bilanciere su panca Scott","Curl con bilanciere EZ su panca inclinata","Curl con Cavo su Panca Inclinata","Curl con Cavo alla Bayesiana (Di Spalle)","Curl a Martello Inverso con Manubri","Curl con presa stretta per bicipiti","Curl con Cavo a Martello con un Braccio","Curl con bilanciere a trascinamento","Curl a Martello di Concentrazione","Curl con Kettlebell per Bicipiti","Curl con Martello al Preacher","Curl di concentrazione con manubrio","Curl con manubri a martello alternato","Curl con Manubri su Panca Inclinata da Seduto","Curl con manubrio su panca Scott a un braccio","Curl con manubri a martello alternato da seduto","Curl con bilanciere alla parete","Curl con Martello alla Corda","Curl con macchina per bicipiti","Curl con bilanciere su panca Scott con cavo","Curl alternato per bicipiti"],
+  Tricipiti:["Piegamenti a Diamante","Dip con sovraccarico","Estensione dei tricipiti su panca inclinata con cavo","Cable Cross Triceps Extension","Estensione dei Tricipiti ai Cavi con Presa Inversa","Pressa JM","Piegamenti sulle Braccia a Braccia Incrociate","Estensione dei Tricipiti in Piedi con un Manubrio","Flessione a Terra con Presa Stretta sulle Ginocchia","Estensione Tricipiti con Bilanciere EZ da Sdraiato","Panca Piana con Presa Stretta su Smith Machine","Piegamento a Presa Stretta su Superficie Inclinata","Estensione Tricipiti Seduta con Bilanciere EZ","Piegamento in stile Cobra","Pressa Tate","Dip su panca con sovraccarico","Pressa su panca inclinata con manubri a presa stretta","Estensione Tricipiti Sopra la Testa con Katana a un Braccio","Estensione Tricipiti con Bilanciere da Sdraiato","Estensione dei Tricipiti con Anelli","Piegamento in Planche","Estensione Tricipiti con Cavo a Corpo Incrociato con un Braccio","Piegamento con Estensione Alternata di Braccio e Gamba","Piegamenti a presa stretta","Planche a Rana","Distensioni alle parallele","Piegamenti sulle braccia per tricipiti","Estensione Tricipiti al Cavo con Presa Inversa a un Braccio","Estensione del Tricipite al Cavo con un Braccio","Estensione dei Tricipiti alla Carrucola Alta Sopra la Testa","Estensione dei Tricipiti sopra la Testa con Cavo","Estensione del Tricipite con Manubrio da Seduto a un Braccio","Estensione Tricipiti con EZ-Bar","Dip per tricipiti su panca da seduti","Dip agli anelli","Estensione dei Tricipiti con Manubri da Sdraiato","Estensione dei Tricipiti in Sospensione","Estensione dei Tricipiti con Manubrio da Seduto","Estensione Tricipiti alla Macchina","Estensione dei Tricipiti con Barra a V","Dip Assistiti alla Macchina","Estensione del Tricipite al Cavo con un Braccio","Estensione dei Tricipiti al Cavo Sopra la Testa (barra)","Pushdown con Barra","Estensione dei Tricipiti con Bilanciere sopra la Testa in Piedi","Estensione Tricipiti con Presa Inversa","Estensione Tricipiti con Katana","Distensioni con Bilanciere su Panca Inclinata Negativa","Estensione del Tricipite ai Cavi","Estensione dei Tricipiti con Manubri da Seduto","Pressa californiana","Estensione dei Tricipiti con Fascia sopra la Testa","Estensione dei Tricipiti con Bilanciere su Panca Inclinata","Flessione a Diamante su Panca Inclinata Negativa","French Press Orizzontale Seduto con Cavo","Piegamento in Planche Completo","Estensione dei Tricipiti con Manubri su Panca Inclinata","Estensione dei Tricipiti con Cavo a Due Braccia","Flessione a Diamante sulle Ginocchia","Estensione dei Tricipiti con Elastico","Macchina per Dip da Seduto","Estensione del Tricipite con Cavo a un Braccio","Estensione del Tricipite sopra la Testa con un Braccio","Push-Up con Presa Inversa","Estensione dei Tricipiti al Cavo con Fune"],
+  Avambracci:["Pronazione con manubri da sdraiato","Curl con manubrio a polso neutro con un braccio","Curl del Polso con Manubrio a un Braccio","Curl inverso del polso da seduto con bilanciere EZ","Supinazione con Manubrio a un Braccio","Camminata del Contadino","Curl del polso in piedi con bilanciere","Curl del polso in piedi con manubri","Flessione del Polso","Curl dei polsi in piedi con bilanciere","Rullo per i polsi","Curl del Polso Seduto con EZ-Bar","Curl con bilanciere a presa inversa per gli avambracci","Camminata del Contadino Unilaterale","Curl inverso con bilanciere EZ su panca inclinata","Trasporto del Contadino con Manubri","Curl con presa inversa con bilanciere EZ","Flessioni Inverse del Polso in Piedi con Manubri","Sospensione Passiva","Curl Inverso del Polso con Bilanciere","Curl con presa inversa al cavo","Curl inverso con manubri per bicipiti","Curl dei Polsi al Cavo","Flessione del Polso al Cavo da Seduto","Retrazioni Scapolari in Sospensione","Curl con bilanciere per i polsi","Pinza per mani","Curl Inverso del Polso con Manubrio a un Braccio","Rotazione del Polso in Piedi con Cavo"],
+  Addominali:["Crunch con ginocchia al petto","Mulino a Vento a Corpo Libero","Rotazione del Tronco","Sospensione in posizione a L","Flessione Laterale in Piedi con Elastico","Torsione da seduto","Rotazione al Cavo (orizzontale)","Gambe Dentro e Fuori","Crunch su panca declinata con sovraccarico","Calci a Forbice in Sospensione","Rotolamento con Ruota per Addominali","Ponte Laterale con Manubri","Crunch addominali","Crunch con torsione in piedi con elastico","Posizione del Corpo Cavo","Crunch con Braccia Tese e Sovraccarico","Sollevamento delle Gambe Tese su Sbarre Parallele","Rotazione al Cavo (alto-basso)","Crunch alternati da seduti","Sollevamento delle Ginocchia al Petto in Sospensione","Sollevamenti delle gambe su panca inclinata","Bandiera del Drago","Sit Up con Sovraccarico","Insetto Morto","Torsione russa con palla medica","Pressa Pallof con Elastico","Torsione Russa con Elastico","Crunch in piedi con elastico","Crunch Laterale in Ginocchio al Cavo","Crunch addominali alla macchina","Crunch a Bicicletta","Forbici","Pressa Pallof Orizzontale al Cavo Basso","Sollevamento delle ginocchia ai gomiti in sospensione","Dead Bug con Peso","Crunch su Palla di Stabilità","Crunch addominali in ginocchio con elastico","Torsione in Piedi con Bilanciere","Crunch addominale","Sollevamento delle gambe dritte da sdraiato","Crunch su macchina in posizione supina","Piegamento ad Anello","Dead Bug con Palla","Plank","Ginocchia alle Gomiti in Sospensione","Crunch circolari inversi da seduti","Sollevamento a V","Rotazione Orizzontale con Elastico","Crunch a V","Piedi Alla Sbarra","Bicicletta Aria in Piedi","Plank con Sovraccarico","Bicicletta Aria","Arrampicata a terra","Sollevamenti delle Gambe Tese alla Sedia del Capitano","Sit Up Inclinato con Rotazione","Cerchi con le Ginocchia in Sospensione","Crunch a Rana","Sollevamento delle Gambe alla Sbarra","Sollevamento delle gambe dritte in sospensione","Torsione con Fascia da Alto a Basso","Chop con Fascia in Mezzo Ginocchio","Posizione a Cavo con Peso","Sollevamento Ginocchia su Ab Coaster","Rotazione del Tronco alla Macchina da Seduti","Sollevamento delle Gambe da Seduto","Crunch Laterale","Sollevamenti a V in Sospensione","Crunch inverso","Flessione Laterale in Piedi con Manubri","Tocchi delle Dita dei Piedi","Torsione Russa con Manubri","Mezzo Mulino a Vento in Sospensione","Torsione Russa con Peso","Calci Alternati da Seduto","Plank Laterale","Plank su Fitball","Plank a sega","Crunch Addominale in Piedi al Cavo","Rotolamento con Bilanciere - Inginocchiato","Rotazione dal basso verso l'alto","Crunch con Fascia in Ginocchio e Rotazione","Plank a quattro zampe","Torsione Spinale da Supino","Sit Up di Janda","Torsione Russa in Piedi","Vuoto Addominale","Crunch Addominale al Cavo da Seduto","Sollevamento delle gambe sospeso con sovraccarico","Crunch addominali con sovraccarico","Gomito al ginocchio del lato opposto","Pressa Pallof Orizzontale ai Cavi","Rotazione con Bilanciere a Terra","Crunch a Bicicletta con Elastico","Sollevamento delle Ginocchia Obliquo in Sospensione","Tocchi alla Caviglia","Sollevamenti delle ginocchia in sospensione","Crunch addominali in ginocchio con cavo","Crunch su panca declinata","Torsione con Bilanciere da Seduti","Sollevamenti delle Ginocchia alla Sedia del Capitano","Sit Up","Plank Laterale Destro","Plank Laterale Sinistro","Plank ai Gomiti","Plank Completo"]
+};
+
+const ALIAS = {
+  "Piegamento sulle Braccia":"push up pushup chest",
+  "Panca con bilanciere":"bench press barbell flat",
+  "Panca Inclinata con Manubri":"incline dumbbell bench press",
+  "Distensione su panca piana con bilanciere":"flat bench press barbell lying chest press",
+  "Distensione su panca declinata con bilanciere":"decline bench press barbell",
+  "Distensione su Panca Inclinata con Bilanciere":"incline barbell bench press",
+  "Apertura con manubri su panca piana":"dumbbell fly flat chest fly",
+  "Croce con Manubri su Panca Inclinata":"incline dumbbell fly chest fly",
+  "Apertura su Pec Deck":"pec deck fly machine chest fly",
+  "Pressa Pettorale su Macchina":"machine chest press",
+  "Pressa per il Petto su Macchina":"machine chest press",
+  "Dip per il petto":"chest dips parallel bars",
+  "Distensioni alle parallele":"dips parallel bars triceps",
+  "Pullover con bilanciere":"barbell pullover",
+  "Distensione con manubri su pavimento":"floor press dumbbell",
+  "Distensione su panca con manubri":"dumbbell bench press flat",
+  "Piegamenti a Diamante":"diamond push up close grip",
+  "Planche inclinato":"lean planche",
+  "Trazione alla sbarra":"pull up chin up",
+  "Trazione alla sbarra con presa inversa":"chin up underhand pull up",
+  "Trazione alla Sbarra Presa Larga":"wide grip pull up",
+  "Lat Pulldown alla Corda":"rope lat pulldown cable",
+  "Lat machine con presa ampia al petto":"wide grip lat pulldown",
+  "Lat Machine con Presa Neutra":"neutral grip lat pulldown",
+  "Lat Machine con Presa Inversa":"reverse grip lat pulldown",
+  "Rematore con Bilanciere Piegato in Avanti":"barbell bent over row",
+  "Rematore con manubri piegato in avanti":"dumbbell bent over row",
+  "Rematore al cavo da seduto":"seated cable row",
+  "Remata al cavo da seduti con presa larga":"seated cable wide grip row",
+  "Rematore Inverso (Australiano)":"inverted row australian pull up bodyweight row",
+  "Rematore Pendlay":"pendlay row barbell",
+  "Scrollata di spalle con bilanciere":"barbell shrug",
+  "Scrollate delle spalle con manubri":"dumbbell shrug",
+  "Vogatore":"rowing machine cardio",
+  "Estensione della Schiena alla Macchina":"back extension machine hyperextension",
+  "Pullover con manubrio":"dumbbell pullover",
+  "Trazioni Australiane Presa Inversa":"australian pull up underhand",
+  "Leveraggio Frontale":"front lever",
+  "Leveraggio Posteriore":"back lever",
+  "Distensione con bilanciere sopra la testa":"overhead press barbell ohp military press",
+  "Distensione delle spalle con manubri da seduto":"seated dumbbell shoulder press",
+  "Distensione delle spalle con manubri in piedi":"standing dumbbell shoulder press",
+  "Pressa Arnold con Manubri da Seduto":"seated arnold press dumbbell",
+  "Pressa Spalle alla Macchina":"machine shoulder press",
+  "Pressa Spalle alla Smith Machine":"smith machine shoulder press",
+  "Alzate laterali con manubri":"lateral raise dumbbell side raise",
+  "Sollevamento Laterale ai Cavi":"cable lateral raise side raise",
+  "Tirata al viso con cavo":"cable face pull rear delt",
+  "Tirata al viso con elastico":"band face pull banded rear delt",
+  "Rematore Verticale con Bilanciere a Presa Larga":"barbell upright row wide grip",
+  "Rematore Verticale con Manubri":"dumbbell upright row",
+  "Sollevamento Frontale con Manubri":"dumbbell front raise",
+  "Sollevamento Frontale con Bilanciere":"barbell front raise",
+  "Piegamenti in verticale":"handstand push up hspu vertical press",
+  "Strappo con manubrio":"dumbbell snatch",
+  "Slancio con Kettlebell":"kettlebell clean jerk",
+  "Sollevamento Turco":"turkish get up",
+  "Aperture Inverse alla Macchina":"machine reverse fly rear delt",
+  "Aperture Inverse ai Cavi per Deltoidi Posteriori":"cable reverse fly rear delt",
+  "Distensione delle spalle con bilanciere dietro il collo":"behind neck press barbell",
+  "Windmill con Kettlebell":"kettlebell windmill",
+  "Squat con bilanciere":"barbell squat back squat",
+  "Squat con Bilanciere Alto":"high bar squat barbell",
+  "Squat con Bilanciere a Bassa Posizione":"low bar squat barbell",
+  "Squat Frontale":"front squat barbell",
+  "Squat Sumo con Bilanciere":"barbell sumo squat wide stance",
+  "Squat Sumo":"sumo squat wide stance",
+  "Squat con manubri":"dumbbell squat",
+  "Squat a Calice con Manubrio":"goblet squat dumbbell",
+  "Squat a pistola":"pistol squat single leg",
+  "Squat con Salto":"jump squat plyometric",
+  "Squat con Box":"box squat",
+  "Squat Zercher":"zercher squat",
+  "Squat Sissy":"sissy squat",
+  "Squat Hack con Bilanciere":"barbell hack squat",
+  "Squat alla Pressa Orizzontale":"hack squat machine",
+  "Pressa per le gambe":"leg press machine",
+  "Pressa per le gambe a posizione larga":"leg press wide stance machine",
+  "Pressa a Gamba Singola":"single leg press",
+  "Macchina per Estensione delle Gambe da Seduto":"leg extension machine seated",
+  "Leg curl da seduto":"seated leg curl machine hamstring curl",
+  "Curl delle gambe da prono":"lying leg curl prone hamstring curl",
+  "Curling Nordico dei Muscoli Posteriori della Coscia":"nordic hamstring curl",
+  "Stacco da Terra a Gambe Tese con Bilanciere":"stiff leg deadlift rdl straight leg",
+  "Stacco Rumeno con Manubri":"romanian deadlift dumbbell rdl",
+  "Stacco Rumeno":"romanian deadlift rdl barbell",
+  "Sollevamento da terra":"deadlift barbell conventional",
+  "Stacco da terra con bilanciere dal rack":"rack pull barbell deadlift",
+  "Stacco da terra con deficit":"deficit deadlift",
+  "Sollevamento da terra con bilanciere esagonale":"trap bar deadlift hex bar",
+  "Affondi":"lunges barbell bodyweight",
+  "Affondi con manubri":"dumbbell lunges",
+  "Affondi in camminata":"walking lunges",
+  "Affondi in camminata con manubri":"dumbbell walking lunges",
+  "Affondi Laterali":"side lunges lateral",
+  "Affondo Bulgaro":"bulgarian split squat",
+  "Affondo Bulgaro con Manubri":"bulgarian split squat dumbbell",
+  "Affondo Bulgaro con Bilanciere":"bulgarian split squat barbell",
+  "Affondo Posteriore":"reverse lunge step back",
+  "Sollevamento del Polpaccio in Piedi":"standing calf raise",
+  "Sollevamento del Polpaccio da Seduto":"seated calf raise",
+  "Sollevamento del Polpaccio con Bilanciere":"barbell calf raise",
+  "Stacco da Terra su una Gamba":"single leg deadlift",
+  "Burpee":"burpee full body",
+  "Salti su Scatola":"box jump plyometric",
+  "Salto con la Corda":"jump rope skipping",
+  "Ellittica":"elliptical trainer cardio",
+  "Oscillazione con Kettlebell":"kettlebell swing",
+  "Strappo":"snatch barbell olympic",
+  "Squat Cossack con Manubri":"cossack squat dumbbell lateral",
+  "Estensione del Ginocchio al Cavo":"cable terminal knee extension tke",
+  "Estensione della Gamba Singola":"single leg extension machine",
+  "Clean con Kettlebell":"kettlebell clean",
+  "Slancio completo":"clean and jerk olympic",
+  "Curl Jefferson":"jefferson curl flexibility",
+  "Sollevamento del Bacino":"hip thrust barbell",
+  "Ponte per i glutei":"glute bridge bodyweight",
+  "Ponte Gluteo con Bilanciere":"barbell hip thrust glute bridge",
+  "Ponte Gluteo con Peso":"weighted glute bridge",
+  "Stacco Rumeno a Gamba Singola":"single leg romanian deadlift rdl",
+  "Stacco da terra sumo":"sumo deadlift barbell",
+  "Good Morning con Bilanciere":"barbell good morning",
+  "Abduzione dell'anca al cavo":"cable hip abduction",
+  "Abduzione dell'anca con fascia elastica":"band hip abduction",
+  "Calcio dell'Asino":"donkey kick glute",
+  "Trazione al Cavo Passante":"cable pull through glute",
+  "Estensione della Schiena":"back extension hyperextension",
+  "Estensione della Schiena con Sovraccarico":"weighted back extension hyperextension",
+  "Camminata Laterale con Elastico":"lateral band walk monster walk",
+  "Spinta dell'anca alla Smith Machine":"smith machine hip thrust",
+  "Ponte Gluteo KAS":"kas glute bridge barbell",
+  "Inclinazione dell'anca":"hip hinge",
+  "Cane da Caccia":"bird dog core",
+  "Curl con Bilanciere per Bicipiti":"barbell biceps curl",
+  "Curl con manubri per bicipiti":"dumbbell biceps curl",
+  "Curl con bilanciere su panca Scott":"preacher curl barbell",
+  "Curl con bilanciere EZ su panca Scott":"ez bar preacher curl",
+  "Curl con manubri a martello":"hammer curl dumbbell",
+  "Curl con manubri da seduto":"seated dumbbell curl",
+  "Curl con Bilanciere EZ per Bicipiti":"ez bar curl biceps",
+  "Curl di concentrazione con manubrio":"concentration curl dumbbell",
+  "Curl con cavo bayesiano":"bayesian cable curl",
+  "Curl Zottman":"zottman curl forearm",
+  "Curl alternato per bicipiti":"alternate biceps curl dumbbell",
+  "Curl con Kettlebell per Bicipiti":"kettlebell biceps curl",
+  "Curl con macchina per bicipiti":"machine biceps curl preacher",
+  "Pushdown con Barra":"cable triceps pushdown bar",
+  "Estensione dei Tricipiti al Cavo con Fune":"rope triceps pushdown cable",
+  "Estensione dei Tricipiti con Barra a V":"v bar triceps pushdown cable",
+  "Dip con sovraccarico":"weighted dips triceps",
+  "Estensione Tricipiti con Bilanciere da Sdraiato":"skull crusher lying barbell triceps extension",
+  "Estensione Tricipiti con Bilanciere EZ da Sdraiato":"ez bar skull crusher lying triceps extension",
+  "Estensione dei Tricipiti sopra la Testa con Cavo":"overhead cable triceps extension",
+  "Estensione dei Tricipiti in Piedi con un Manubrio":"overhead dumbbell triceps extension french press",
+  "Pressa JM":"jm press triceps",
+  "Pressa Tate":"tate press triceps dumbbell",
+  "Pressa californiana":"california press triceps",
+  "Piegamento in Planche":"planche push up",
+  "Panca Piana con Presa Stretta su Smith Machine":"close grip smith bench press triceps",
+  "Camminata del Contadino":"farmer walk carry grip",
+  "Sospensione Passiva":"dead hang grip",
+  "Pinza per mani":"hand gripper grip strength",
+  "Curl con bilanciere a presa inversa per gli avambracci":"reverse grip barbell curl forearm",
+  "Rullo per i polsi":"wrist roller forearm",
+  "Curl del Polso con Manubrio a un Braccio":"wrist curl dumbbell forearm",
+  "Plank":"plank core isometric straight arm",
+  "Plank ai Gomiti":"elbow plank forearm plank gomiti",
+  "Plank Completo":"full plank straight arm complete plank",
+  "Plank Laterale":"side plank core oblique",
+  "Plank Laterale Destro":"side plank right oblique core destra",
+  "Plank Laterale Sinistro":"side plank left oblique core sinistra",
+  "Crunch addominali":"crunch ab core basic",
+  "Crunch addominale":"sit up crunch ab basic",
+  "Sit Up":"sit up situp ab core",
+  "Sit Up con Sovraccarico":"weighted sit up ab",
+  "Sit Up Inclinato con Rotazione":"incline sit up twist rotation",
+  "Sit Up di Janda":"janda sit up ab",
+  "Bandiera del Drago":"dragon flag bruce lee core",
+  "Crunch a Bicicletta":"bicycle crunch ab oblique",
+  "Sollevamento delle Gambe alla Sbarra":"hanging leg raise bar ttb",
+  "Sollevamento delle Ginocchia al Petto in Sospensione":"hanging knee raise",
+  "Piedi Alla Sbarra":"toes to bar ttb",
+  "Crunch inverso":"reverse crunch ab",
+  "Rotolamento con Ruota per Addominali":"ab wheel rollout",
+  "Sospensione in posizione a L":"l sit core isometric",
+  "Insetto Morto":"dead bug core stability",
+  "Pressa Pallof con Elastico":"pallof press band anti rotation",
+  "Pressa Pallof Orizzontale ai Cavi":"cable pallof press anti rotation",
+  "Torsione Russa con Manubri":"russian twist dumbbell oblique",
+  "Torsione russa con palla medica":"russian twist medicine ball",
+  "Arrampicata a terra":"mountain climber core cardio",
+  "Rotolamento con Bilanciere - Inginocchiato":"barbell rollout ab wheel kneeling",
+  "Sollevamento a V":"v up crunch legs arms",
+  "Vuoto Addominale":"abdominal vacuum stomach",
+  "Bicicletta Aria":"air bike abs scissors",
+  "Tocchi alla Caviglia":"ankle touches lateral crunch oblique caviglie",
+  "Mulino a Vento a Corpo Libero":"windmill bodyweight",
+  "Posizione del Corpo Cavo":"hollow body hold core",
+  "Crunch Laterale":"lateral crunch oblique side crunch",
+};
+
+const ALL_ES = [];
+Object.entries(DB).forEach(([g, l]) => {
+  l.forEach(n => {
+    if(n) ALL_ES.push({
+      nome: n,
+      gruppo: g,
+      cerca: (n + ' ' + (ALIAS[n] || '')).toLowerCase()
+    });
+  });
+});
+
+function gifPath(nome, gruppo) {
+  const slug = nome.toLowerCase()
+    .replace(/à/g,'a').replace(/è/g,'e').replace(/é/g,'e')
+    .replace(/ì/g,'i').replace(/ò/g,'o').replace(/ù/g,'u')
+    .replace(/['\u2019]/g,'')
+    .replace(/[^a-z0-9\s]/g,'')
+    .trim().replace(/\s+/g,'_');
+  return 'gifs/' + gruppo + '/' + slug + '.gif';
+}
+
+// ══════════════════════════════════════════════════
+// STATO
+// ══════════════════════════════════════════════════
+let step = 1, STEPS = 6;
+let scheda = {nome_utente:'USER', giorni:[]};
+let numG = 0, muscG = [], tabMusc = 0, tabEs = 0, esState = [];
+
+// ══════════════════════════════════════════════════
+// CARICA JSON STEP 1
+// ══════════════════════════════════════════════════
+function caricaJSONStep1(ev) {
+  const f = ev.target.files[0]; if(!f) return;
+  const r = new FileReader();
+  r.onload = e => {
+    try {
+      const p = JSON.parse(e.target.result);
+      scheda = p;
+      document.getElementById('input-nome').value = p.nome_utente || '';
+      numG = p.giorni.length;
+      document.querySelectorAll('.day-btn').forEach((b,i) => b.classList.toggle('selected', i+1 === numG));
+      muscG = p.giorni.map(g => {
+        return g.titolo.split('&').map(t => {
+          const raw = t.trim();
+          const norm = raw.charAt(0).toUpperCase() + raw.slice(1).toLowerCase();
+          return Object.keys(DB).includes(norm) ? norm : null;
+        }).filter(Boolean);
+      });
+      esState = p.giorni.map(g =>
+        (g.esercizi || []).map(es => {
+          const nomiArr = (es.nome || '').split(',').map(n => n.trim()).filter(Boolean);
+          // determina se la gif è custom o automatica
+          const primoNome = nomiArr[0] || '';
+          const trovato = ALL_ES.find(e => e.nome === primoNome);
+          const gifAuto = trovato ? gifPath(primoNome, trovato.gruppo) : '';
+          const gifCustom = es.gif_file && es.gif_file !== gifAuto;
+          return {
+            nome: es.nome || '',
+            tipo: es.tipo || 'normale',
+            serie: es.serie || 4,
+            reps: es.reps || '12',
+            recupero_sec: es.recupero_sec || 90,
+            tempo_lavoro_sec: es.tempo_lavoro_sec || 30,
+            note: es.note || '',
+            gif_file: es.gif_file || '',
+            _gifCustom: gifCustom,  // ← aggiunto
+            nomi_circuito: es.tipo === 'circuito' ? nomiArr : [],
+            nomi_normali: es.tipo !== 'circuito' ? nomiArr : [],
+            _open: false
+          };
+        })
+      );
+      document.getElementById('load-card-info').innerHTML =
+        `✅ <strong>${p.nome_utente}</strong> — ${numG} giorni caricati`;
+      document.getElementById('btn-clear-json').style.display = 'inline-flex';
+    } catch(err) {
+      document.getElementById('load-card-info').textContent = '❌ File JSON non valido!';
+    }
+  };
+  r.readAsText(f);
+}
+
+function clearJSON() {
+  scheda = {nome_utente:'USER', giorni:[]};
+  numG = 0; muscG = []; esState = [];
+  document.getElementById('input-nome').value = '';
+  document.getElementById('load-card-info').textContent = 'Carica il tuo workout.json per modificarlo';
+  document.getElementById('btn-clear-json').style.display = 'none';
+  document.querySelectorAll('.day-btn').forEach(b => b.classList.remove('selected'));
+}
+
+// ══════════════════════════════════════════════════
+// NAV
+// ══════════════════════════════════════════════════
+function upd() {
+  const ind = document.getElementById('steps-ind');
+  ind.innerHTML = '';
+  for(let i = 1; i <= STEPS; i++) {
+    const d = document.createElement('div');
+    d.className = 'step-dot' + (i === step ? ' active' : i < step ? ' done' : '');
+    ind.appendChild(d);
+  }
+  document.getElementById('btn-back').style.visibility = step === 1 ? 'hidden' : 'visible';
+  const bn = document.getElementById('btn-next');
+  if(step === 6) { bn.style.display = 'none'; }
+  else { bn.style.display = ''; bn.textContent = step === 5 ? '📡 Invia →' : 'Avanti →'; }
+}
+
+function show(n) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-' + n).classList.add('active');
+  document.getElementById('ms').scrollTop = 0;
+}
+
+function stepNext() {
+  if(step === 1) {
+    const n = document.getElementById('input-nome').value.trim();
+    if(!n) { document.getElementById('input-nome').focus(); return; }
+    scheda.nome_utente = n;
+  }
+  if(step === 2 && numG === 0) return;
+  if(step === 4) buildJSON_internal();
+  if(step === 5) { step = 6; show(6); upd(); return; }
+  step++;
+  if(step === 3) initMusc();
+  if(step === 4) initEs();
+  if(step === 5) renderSummary();
+  show(step); upd();
+}
+
+function stepBack() { if(step <= 1) return; step--; show(step); upd(); }
+
+// ══════════════════════════════════════════════════
+// STEP 2
+// ══════════════════════════════════════════════════
+function selGiorni(n) {
+  numG = n;
+  document.querySelectorAll('.day-btn').forEach((b, i) => b.classList.toggle('selected', i+1 === n));
+}
+
+// ══════════════════════════════════════════════════
+// STEP 3 — MUSCOLI
+// ══════════════════════════════════════════════════
+const MUSC = ['Pettorali','Schiena','Spalle','Gambe','Glutei','Bicipiti','Tricipiti','Avambracci','Addominali'];
+
+function initMusc() {
+  if(muscG.length !== numG) muscG = Array.from({length: numG}, () => []);
+  tabMusc = 0; renderMuscTabs(); renderMuscPanel();
+}
+
+function renderMuscTabs() {
+  const t = document.getElementById('musc-tabs'); t.innerHTML = '';
+  for(let i = 0; i < numG; i++) {
+    const d = document.createElement('div');
+    d.className = 'gtab' + (i === tabMusc ? ' active' : '');
+    d.textContent = 'G' + (i+1);
+    d.onclick = (idx => () => { tabMusc = idx; renderMuscTabs(); renderMuscPanel(); })(i);
+    t.appendChild(d);
+  }
+}
+
+function renderMuscPanel() {
+  const sel = muscG[tabMusc] || [];
+  document.getElementById('musc-panel').innerHTML = `
+    <div style="font-size:.8rem;color:var(--muted2);margin-bottom:14px">
+      Gruppi muscolari per <strong style="color:var(--text)">Giorno ${tabMusc+1}</strong>
+    </div>
+    <div class="muscoli-grid">
+      ${MUSC.map(m => `<div class="muscolo-chip ${sel.includes(m)?'selected':''}" onclick="togMusc('${m}')">${m}${sel.includes(m)?' ✓':''}</div>`).join('')}
+    </div>`;
+}
+
+function togMusc(m) {
+  const s = muscG[tabMusc], i = s.indexOf(m);
+  if(i >= 0) s.splice(i, 1); else s.push(m);
+  renderMuscPanel();
+}
+
+// ══════════════════════════════════════════════════
+// STEP 4 — ESERCIZI
+// ══════════════════════════════════════════════════
+function initEs() {
+  if(esState.length !== numG) esState = Array.from({length: numG}, () => []);
+  tabEs = 0; renderEsTabs(); renderEsPanel();
+}
+
+function renderEsTabs() {
+  const t = document.getElementById('es-tabs'); t.innerHTML = '';
+  for(let i = 0; i < numG; i++) {
+    const ms = (muscG[i] || []).map(m => m.substring(0,3).toUpperCase()).join('+');
+    const d = document.createElement('div');
+    d.className = 'gtab' + (i === tabEs ? ' active' : '');
+    d.innerHTML = `G${i+1} <span style="font-size:.65rem;opacity:.6">${ms||'—'}</span>`;
+    d.onclick = (idx => () => { tabEs = idx; renderEsTabs(); renderEsPanel(); })(i);
+    t.appendChild(d);
+  }
+}
+
+function renderEsPanel() {
+  const panel = document.getElementById('es-panel');
+  const list = esState[tabEs] || [];
+  let h = '<div class="es-wrap">';
+  list.forEach((es, i) => { h += buildEsCard(tabEs, i, es); });
+  h += `</div><div class="add-btn-wrap"><button class="btn btn-gray btn-sm" style="width:100%" onclick="addEs(${tabEs})">+ Aggiungi Esercizio</button></div>`;
+  panel.innerHTML = h;
+}
+
+function buildEsCard(g, i, es) {
+  const circ = es.tipo === 'circuito';
+  const total = esState[g].length;
+  const isOpen = es._open === true || (i === total - 1 && es._open !== false);
+
+  // FIX: preview mostra TUTTI i nomi
+  const tagList = circ ? (es.nomi_circuito||[]) : (es.nomi_normali||[]);
+  const preview = tagList.length
+    ? tagList.join(', ')
+    : (es.nome || 'Nuovo esercizio');
+
+  const tagStyle = circ
+    ? 'background:#1f1400;border:1px solid #3a2a00;border-radius:6px;padding:4px 10px;font-size:.78rem;color:var(--gold)'
+    : 'background:#0d1f0d;border:1px solid #1a3a1a;border-radius:6px;padding:4px 10px;font-size:.78rem;color:var(--green)';
+
+  const tagsHtml = `
+    <div class="field">
+      <label>${circ ? 'Esercizi nel circuito (× per rimuovere)' : 'Esercizi (× per rimuovere — il primo dà la GIF)'}</label>
+      <div class="circ-tags" id="ctags-${g}-${i}">
+        ${tagList.length === 0
+          ? '<span style="font-size:.75rem;color:var(--muted)">Nessun esercizio aggiunto</span>'
+          : tagList.map((n, ti) => `
+            <div style="${tagStyle};display:inline-flex;align-items:center;gap:5px">
+              <span>${n}</span>
+              <button onclick="${circ ? `removeCircTag` : `removeNormTag`}(${g},${i},${ti})" title="Rimuovi" style="background:none;border:none;color:${circ?'#cc8800':'#009944'};cursor:pointer;font-size:1rem;line-height:1;padding:0;margin-left:2px">×</button>
+            </div>`).join('')}
+      </div>
+    </div>`;
+
+  const disUp   = i === 0         ? 'disabled' : '';
+  const disDown = i === total - 1 ? 'disabled' : '';
+
+  return `<div class="es-card ${isOpen?'open':''}" id="ec-${g}-${i}">
+    <div class="es-card-header" onclick="togEs(${g},${i})">
+      <span class="es-num">ES.${i+1}</span>
+      <span class="es-name-preview">${preview}</span>
+      <span class="es-tipo-pill ${circ?'pill-circuito':'pill-normale'}">${circ?'CIRC':'NORM'}</span>
+      <button class="btn-move" ${disUp}  onclick="event.stopPropagation();moveEs(${g},${i},-1)">↑</button>
+      <button class="btn-move" ${disDown} onclick="event.stopPropagation();moveEs(${g},${i},+1)">↓</button>
+      <button class="btn btn-red btn-sm" style="padding:4px 8px" onclick="event.stopPropagation();delEs(${g},${i})">✕</button>
+    </div>
+    <div class="es-card-body">
+      <div class="field">
+        <label>${circ ? 'Aggiungi esercizio al circuito' : 'Cerca esercizio (puoi aggiungerne più di uno)'}</label>
+        <div class="search-wrap">
+          <span class="search-icon">🔍</span>
+          <input class="search-input" type="text"
+            placeholder="${circ ? 'Cerca e aggiungi...' : 'digita per cercare...'}"
+            id="si-${g}-${i}" oninput="cercaEs(${g},${i},this.value)" onfocus="openSearch(${g},${i})" autocomplete="off">
+        </div>
+        <div class="search-results" id="sr-${g}-${i}"></div>
+      </div>
+      ${tagsHtml}
+      <div class="field">
+        <label>Tipo</label>
+        <div class="tipo-toggle">
+          <div class="tipo-opt ${!circ?'active-normale':''}" onclick="setTipo(${g},${i},'normale')">Normale</div>
+          <div class="tipo-opt ${circ?'active-circuito':''}" onclick="setTipo(${g},${i},'circuito')">Circuito</div>
+        </div>
+      </div>
+      <div class="row-fields-3">
+        <div class="field"><label>Serie</label>
+          <input type="number" min="1" max="20" value="${es.serie||4}" oninput="setF(${g},${i},'serie',parseInt(this.value)||4)">
+        </div>
+        <div class="field"><label>Rep</label>
+          <input type="text" value="${es.reps||'12'}" placeholder="12 / 10,8,6" oninput="setF(${g},${i},'reps',this.value)">
+        </div>
+        <div class="field"><label>Rec (sec)</label>
+          <input type="number" min="0" max="600" value="${es.recupero_sec||90}" oninput="setF(${g},${i},'recupero_sec',parseInt(this.value)||60)">
+        </div>
+      </div>
+      ${circ?`<div class="field"><label>Tempo Lavoro per esercizio (sec)</label>
+        <input type="number" min="1" max="300" value="${es.tempo_lavoro_sec||30}" oninput="setF(${g},${i},'tempo_lavoro_sec',parseInt(this.value)||30)">
+      </div>`:''}
+      <div class="field">
+        <label>GIF personalizzata (opzionale)</label>
+        <div style="background:#0a0a0a;border:1px solid var(--border);border-radius:8px;padding:10px 12px;font-size:.78rem;color:var(--muted2);line-height:1.6;margin-bottom:8px">
+          📐 <strong style="color:var(--text)">Requisiti:</strong> ~100×100px, sfondo nero<br>
+          🛠 <strong style="color:var(--text)">ezgif.com →</strong> Resize (100px) → Effects → Change Background Color (#000000) → Optimize → Coalesce<br>
+          💾 <strong style="color:var(--text)">Salva nella SD:</strong> <span id="gif-path-hint-${g}-${i}" style="color:var(--gold);font-family:monospace">${es.gif_file ? es.gif_file : '/gifs/GRUPPO/nome_file.gif'}</span>
+        </div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <label class="btn btn-gray btn-sm" style="cursor:pointer;flex:1">
+            ${es._gifPreview ? '✅ GIF caricata' : '📂 Carica GIF per anteprima'}
+            <input type="file" accept=".gif,image/gif" style="display:none" onchange="caricaGifPreview(${g},${i},this)">
+          </label>
+          ${es._gifPreview ? `<button class="btn btn-red btn-sm" onclick="rimuoviGifPreview(${g},${i})">✕</button>` : ''}
+        </div>
+        ${es._gifPreview ? `<div style="margin-top:8px;text-align:center">
+          <img src="${es._gifPreview}" style="width:100px;height:100px;object-fit:contain;background:#000;border:1px solid var(--border);border-radius:6px">
+        </div>` : ''}
+        ${es.gif_file ? `<div style="margin-top:8px;background:#1a1000;border:1px solid #4a3000;border-radius:8px;padding:8px 12px;font-size:.76rem;line-height:1.7">
+          ⚠️ <strong style="color:var(--text)">Le GIF NON vengono inviate via BLE.</strong><br>
+          Copia manualmente il file nella SD nel percorso:<br>
+          <code style="color:var(--gold2);word-break:break-all;font-size:.74rem">${es.gif_file}</code>
+          <div style="margin-top:10px;text-align:center">
+            <img src="${es.gif_file}" 
+              style="width:80px;height:80px;object-fit:contain;background:#000;border:1px solid #4a3000;border-radius:6px"
+              onerror="this.style.display='none'">
+          </div>
+        </div>` : ''}
+        <div class="field" style="margin-top:8px">
+          <label>Percorso SD (modificabile manualmente)</label>
+          <input type="text" value="${es.gif_file||''}" placeholder="/gifs/Pettorali/nome_esercizio.gif"
+            oninput="setF(${g},${i},'gif_file',this.value);aggiornaGifHint(${g},${i},this.value)">
+        </div>
+      </div>
+      <div class="field"><label>Note (opzionale)</label>
+        <textarea placeholder="Indicazioni tecniche, peso..." oninput="setF(${g},${i},'note',this.value)">${es.note||''}</textarea>
+      </div>
+    </div>
+  </div>`;
+}
+
+function caricaGifPreview(g, i, input) {
+  const f = input.files[0]; 
+  if(!f) return;
+
+  const es = esState[g][i];
+  const circ = es.tipo === 'circuito';
+  
+  let slug, gruppo, percorsoFinalizzato;
+
+  if(circ) {
+    // CIRCUITO: concatena tutti i nomi con underscore
+    const nomi = es.nomi_circuito || [];
+    if(!nomi.length) { alert('Aggiungi prima gli esercizi al circuito!'); return; }
+
+    // Genera slug per ogni nome e li unisce
+    slug = nomi.map(n =>
+      n.toLowerCase()
+        .replace(/[àáâ]/g,'a').replace(/[èéê]/g,'e').replace(/[ìí]/g,'i')
+        .replace(/[òó]/g,'o').replace(/[ùú]/g,'u')
+        .replace(/[^a-z0-9]/g,'_')
+        .replace(/_+/g,'_')
+        .replace(/^_|_$/g,'')
+    ).join('_');
+
+    // Cerca il gruppo del primo esercizio
+    const trovato = ALL_ES.find(e => e.nome === nomi[0]);
+    gruppo = trovato ? trovato.gruppo : 'Custom';
+    percorsoFinalizzato = `/gifs/${gruppo}/${slug}.gif`;
+
+  } else {
+    // NORMALE: concatena tutti i nomi come il circuito
+    const nomi = es.nomi_normali || [];
+    if(!nomi.length) { alert('Aggiungi prima gli esercizi!'); return; }
+
+    slug = nomi.map(n =>
+      n.toLowerCase()
+        .replace(/[àáâ]/g,'a').replace(/[èéê]/g,'e').replace(/[ìí]/g,'i')
+        .replace(/[òó]/g,'o').replace(/[ùú]/g,'u')
+        .replace(/[^a-z0-9]/g,'_')
+        .replace(/_+/g,'_')
+        .replace(/^_|_$/g,'')
+    ).join('_');
+
+    const trovato = ALL_ES.find(e => e.nome === nomi[0]);
+    gruppo = trovato ? trovato.gruppo : 'Custom';
+    percorsoFinalizzato = `/gifs/${gruppo}/${slug}.gif`;
+  }
+
+  es.gif_file = percorsoFinalizzato;
+  esState[g][i]._gifFile = f;
+  esState[g][i]._gifCustom = true;
+
+  const reader = new FileReader();
+  reader.onload = ev => {
+    esState[g][i]._gifPreview = ev.target.result;
+    renderEsPanel();
+  };
+  reader.readAsDataURL(f);
+}
+
+function rimuoviGifPreview(g, i) {
+  esState[g][i]._gifPreview = null;
+  esState[g][i]._gifFile = null;
+  esState[g][i]._gifCustom = false; // ← aggiunto
+  // ricalcola gif automatica se ci sono esercizi normali
+  const es = esState[g][i];
+  if(es.tipo !== 'circuito' && es.nomi_normali.length > 0) {
+    // Se un solo esercizio → gif automatica dal primo nome
+    // Se più esercizi → nessuna gif automatica (serviva quella custom)
+    if(es.nomi_normali.length === 1) {
+      const primoNome = es.nomi_normali[0];
+      const trovato = ALL_ES.find(e => e.nome === primoNome);
+      es.gif_file = trovato ? gifPath(primoNome, trovato.gruppo) : '';
+    } else {
+      es.gif_file = '';
+    }
+  } else {
+    es.gif_file = '';
+  }
+  renderEsPanel();
+}
+
+function aggiornaGifHint(g, i, val) {
+  const el = document.getElementById(`gif-path-hint-${g}-${i}`);
+  if(el) el.textContent = val || '/gifs/GRUPPO/nome_file.gif';
+}
+
+function removeCircTag(g, i, ti) {
+  esState[g][i].nomi_circuito.splice(ti, 1);
+  esState[g][i].nome = esState[g][i].nomi_circuito.join(', ');
+  renderEsPanel();
+}
+
+function removeNormTag(g, i, ti) {
+  esState[g][i].nomi_normali.splice(ti, 1);
+  if(!esState[g][i]._gifCustom) {  // ← non toccare gif custom
+    if(esState[g][i].nomi_normali.length > 0) {
+      const primoNome = esState[g][i].nomi_normali[0];
+      const trovato = ALL_ES.find(e => e.nome === primoNome);
+      esState[g][i].gif_file = trovato ? gifPath(primoNome, trovato.gruppo) : '';
+    } else {
+      esState[g][i].gif_file = '';
+    }
+  }
+  esState[g][i].nome = esState[g][i].nomi_normali.join(', ');
+  renderEsPanel();
+}
+
+function togEs(g, i) {
+  const c = document.getElementById(`ec-${g}-${i}`);
+  esState[g][i]._open = !c.classList.contains('open');
+  c.classList.toggle('open');
+}
+
+function addEs(g) {
+  esState[g].forEach(e => e._open = false);
+  esState[g].push({nome:'',tipo:'normale',serie:4,reps:'12',recupero_sec:90,tempo_lavoro_sec:30,note:'',gif_file:'',nomi_circuito:[],nomi_normali:[],_open:true});
+  renderEsPanel();
+}
+
+function delEs(g, i) { esState[g].splice(i, 1); renderEsPanel(); }
+
+function moveEs(g, i, dir) {
+  const list = esState[g];
+  const j = i + dir;
+  if(j < 0 || j >= list.length) return;
+  [list[i], list[j]] = [list[j], list[i]];
+  renderEsPanel();
+}
+
+function setF(g, i, f, v) { esState[g][i][f] = v; }
+
+function setTipo(g, i, t) {
+  esState[g][i].tipo = t;
+  if(t === 'circuito' && !esState[g][i].nomi_circuito) esState[g][i].nomi_circuito = [];
+  if(t === 'normale' && !esState[g][i].nomi_normali) esState[g][i].nomi_normali = [];
+  renderEsPanel();
+}
+
+// ══════════════════════════════════════════════════
+// RICERCA
+// ══════════════════════════════════════════════════
+function openSearch(g, i) {
+  const muscoli = muscG[g] || [];
+  let pool;
+  if(muscoli.length > 0) {
+    pool = [];
+    muscoli.forEach(m => pool.push(...ALL_ES.filter(e => e.gruppo === m).slice(0, 6)));
+  } else {
+    pool = ALL_ES.slice(0, 20);
+  }
+  const sr = document.getElementById(`sr-${g}-${i}`);
+  sr.innerHTML = pool.map(e => buildSearchItem(g, i, e)).join('');
+  sr.classList.add('open');
+}
+
+function cercaEs(g, i, q) {
+  const sr = document.getElementById(`sr-${g}-${i}`);
+  if(!q || q.length < 2) { sr.classList.remove('open'); return; }
+  const tokens = q.toLowerCase().trim().split(/\s+/).filter(t => t.length > 0);
+  const m = ALL_ES.filter(e => tokens.every(tok => e.cerca.includes(tok))).slice(0, 20);
+  if(!m.length) { sr.classList.remove('open'); return; }
+  sr.innerHTML = m.map(e => buildSearchItem(g, i, e)).join('');
+  sr.classList.add('open');
+}
+
+function buildSearchItem(g, i, e) {
+  const alias = ALIAS[e.nome];
+  const sub = alias
+    ? `<br><span style="font-size:.62rem;color:var(--muted);font-style:italic;line-height:1.2">${alias.split(' ').slice(0,4).join(' ')}</span>`
+    : '';
+
+  const gp = gifPath(e.nome, e.gruppo);
+
+  return `<div class="search-item" style="flex-direction:row;align-items:center;gap:8px"
+    data-g="${g}" data-i="${i}"
+    data-nome="${e.nome.replace(/"/g,'&quot;')}"
+    data-gruppo="${e.gruppo}"
+    onclick="selEsFromEl(this)">
+    <img src="${gp}"
+      style="width:36px;height:36px;object-fit:contain;background:#000;border-radius:4px;flex-shrink:0;border:1px solid #2a2a2a"
+      onerror="this.style.display='none'">
+    <div style="flex:1;min-width:0">
+      <span>${e.nome}${sub}</span>
+    </div>
+    <span class="es-gruppo" style="flex-shrink:0">${e.gruppo.toUpperCase()}</span>
+  </div>`;
+}
+
+function selEsFromEl(el) {
+  const g = parseInt(el.dataset.g), i = parseInt(el.dataset.i);
+  const nome = el.dataset.nome, gruppo = el.dataset.gruppo;
+  const es = esState[g][i];
+  if(es.tipo === 'circuito') {
+    if(!es.nomi_circuito) es.nomi_circuito = [];
+    if(!es.nomi_circuito.includes(nome)) es.nomi_circuito.push(nome);
+    es.nome = es.nomi_circuito.join(', ');
+  } else {
+    if(!es.nomi_normali) es.nomi_normali = [];
+    if(!es.nomi_normali.includes(nome)) {
+      es.nomi_normali.push(nome);
+      // gif segue il primo esercizio della lista
+      if(es.nomi_normali.length === 1 && !es._gifCustom) {
+        es._gifGruppo0 = gruppo;
+        es.gif_file = gifPath(nome, gruppo);
+      }
+    }
+    // FIX: es.nome contiene TUTTI i nomi, non solo il primo
+    es.nome = es.nomi_normali.join(', ');
+  }
+  document.getElementById(`sr-${g}-${i}`)?.classList.remove('open');
+  document.getElementById(`si-${g}-${i}`).value = '';
+  renderEsPanel();
+}
+
+document.addEventListener('click', e => {
+  if(!e.target.closest('.search-wrap') && !e.target.closest('.search-results'))
+    document.querySelectorAll('.search-results').forEach(r => r.classList.remove('open'));
+});
+
+// ══════════════════════════════════════════════════
+// BUILD JSON
+// ══════════════════════════════════════════════════
+function buildJSON_internal() {
+  scheda.giorni = [];
+  for(let i = 0; i < numG; i++) {
+    const ms = muscG[i] || [];
+    const titolo = ms.map(m => m.toUpperCase()).join(' & ') || `GIORNO ${i+1}`;
+    const esercizi = (esState[i] || []).map(es => {
+      let nomeOut;
+      if(es.tipo === 'circuito') {
+        nomeOut = (es.nomi_circuito && es.nomi_circuito.length)
+          ? es.nomi_circuito.join(', ')
+          : (es.nome || 'ESERCIZIO');
+      } else {
+        // FIX: salva TUTTI i nomi per esercizi normali
+        nomeOut = (es.nomi_normali && es.nomi_normali.length)
+          ? es.nomi_normali.join(', ')
+          : (es.nome || 'ESERCIZIO');
+      }
+      const o = {tipo: es.tipo||'normale', nome: nomeOut, serie: es.serie||4, reps: es.reps||'12', recupero_sec: es.recupero_sec||90};
+      if(es.tipo === 'circuito') o.tempo_lavoro_sec = es.tempo_lavoro_sec || 30;
+      if(es.note) o.note = es.note;
+      // FIX: salva gif_file sempre se presente (rimuovi il controllo tipo)
+      if(es.gif_file) o.gif_file = es.gif_file;
+      return o;
+    });
+    scheda.giorni.push({id_giorno: i+1, titolo, esercizi});
+  }
+}
+
+// ══════════════════════════════════════════════════
+// STEP 5 — RIEPILOGO
+// ══════════════════════════════════════════════════
+function renderSummary() {
+  buildJSON_internal();
+  let h = `<div class="summary-card" style="display:flex;align-items:center;gap:14px">
+    <div style="font-size:2rem">👤</div>
+    <div><div style="font-family:'Bebas Neue',sans-serif;font-size:1.3rem;letter-spacing:2px">${scheda.nome_utente}</div>
+    <div style="font-size:.8rem;color:var(--muted2)">${numG} giorni di allenamento</div></div></div>`;
+  scheda.giorni.forEach((g, i) => {
+    h += `<div class="summary-card"><div class="summary-day-title">G${i+1} — ${g.titolo}</div>`;
+    if(!g.esercizi.length) h += `<div style="font-size:.8rem;color:var(--muted)">Nessun esercizio</div>`;
+    else g.esercizi.forEach(es => {
+      // FIX: nel summary mostra tutti i nomi (separati da virgola, già in es.nome)
+      const nomiDisplay = es.nome || '';
+      h += `<div class="summary-es"><div class="${es.tipo==='circuito'?'dot-g':'dot-v'}"></div>
+      <span style="flex:1;word-break:break-word">${nomiDisplay}</span><span style="margin-left:8px;flex-shrink:0;font-size:.75rem;color:var(--muted)">${es.serie}×${es.reps}</span></div>`;
+    });
+    h += `</div>`;
+  });
+  document.getElementById('summary').innerHTML = h;
+}
+
+// ══════════════════════════════════════════════════
+// BLE
+// ══════════════════════════════════════════════════
+const SVC = '12345678-1234-1234-1234-123456789abc';
+const RXC = '12345678-1234-1234-1234-123456789abd';
+const STC = '12345678-1234-1234-1234-123456789abe';
+const GFC = '12345678-1234-1234-1234-123456789abf';
+const CSZ = 200;
+let bDev = null, bRx = null, bSt = null, bGif = null, bConn = false;
+
+function bLog(m, t='') {
+  const l = document.getElementById('ble-log');
+  const d = document.createElement('div'); d.className = t;
+  d.textContent = `[${new Date().toLocaleTimeString()}] ${m}`;
+  l.appendChild(d); l.scrollTop = l.scrollHeight;
+}
+
+async function bleConnect() {
+  if(!navigator.bluetooth) { bLog('Web Bluetooth non disponibile. Usa Chrome su Android.','err'); return; }
+  try {
+    bLog('Ricerca GymOS...','info');
+    bDev = await navigator.bluetooth.requestDevice({filters:[{name:'GymOS'}], optionalServices:[SVC]});
+    bDev.addEventListener('gattserverdisconnected', onDisc);
+    const srv = await bDev.gatt.connect();
+    const svc = await srv.getPrimaryService(SVC);
+    bRx = await svc.getCharacteristic(RXC);
+    bSt = await svc.getCharacteristic(STC);
+    bGif = await svc.getCharacteristic(GFC);
+    await bSt.startNotifications();
+    bSt.addEventListener('characteristicvaluechanged', e => {
+      const v = new TextDecoder().decode(e.target.value);
+      bLog('ESP32 → ' + v, v==='OK'?'ok':v==='ERR'?'err':'info');
+    });
+    bConn = true;
+    document.getElementById('ble-icon').textContent = '🟢';
+    document.getElementById('ble-label').textContent = 'CONNESSO A ' + bDev.name;
+    document.getElementById('btn-conn').style.display = 'none';
+    document.getElementById('btn-disc').style.display = 'block';
+    document.getElementById('btn-send').disabled = false;
+    bLog('Connesso a ' + bDev.name, 'ok');
+  } catch(e) { bLog('Errore: ' + e.message, 'err'); }
+}
+
+function onDisc() {
+  bConn = false; bRx = null; bSt = null; bGif = null;
+  document.getElementById('ble-icon').textContent = '📡';
+  document.getElementById('ble-label').textContent = 'DISCONNESSO';
+  document.getElementById('btn-conn').style.display = 'block';
+  document.getElementById('btn-disc').style.display = 'none';
+  document.getElementById('btn-send').disabled = true;
+  bLog('Dispositivo disconnesso.','err');
+}
+
+function bleDisconnect() { if(bDev?.gatt.connected) bDev.gatt.disconnect(); }
+
+// Helper: invia dati binari in chunk su caratteristica BLE
+async function inviaChunkBLE(char, data, label, pi) {
+  const n = Math.ceil(data.length / CSZ);
+  for(let i = 0; i < n; i++) {
+    await char.writeValueWithResponse(data.slice(i*CSZ, (i+1)*CSZ));
+    const p = Math.round(((i+1)/n)*100);
+    if(pi) pi.style.width = p + '%';
+    bLog(`${label} ${i+1}/${n} (${p}%)`,'');
+    await sleep(40);
+  }
+}
+
+async function bleInviaScheda() {
+  if(!bConn || !bRx) { bLog('Non connesso!','err'); return; }
+  buildJSON_internal();
+  scaricaJSON();
+  await sleep(300);
+  bLog('Backup JSON scaricato.','ok');
+
+  const po = document.getElementById('prog-outer'), pi = document.getElementById('prog-inner');
+  po.classList.add('show'); pi.style.width = '0%';
+
+  // 1. Invia JSON
+  try {
+    const bytes = new TextEncoder().encode(JSON.stringify(scheda, null, 2));
+    bLog('Invio JSON: ' + bytes.length + ' byte...','info');
+    await bRx.writeValueWithResponse(new TextEncoder().encode('BEGIN'));
+    bLog('BEGIN inviato','info'); await sleep(100);
+    await inviaChunkBLE(bRx, bytes, 'JSON chunk', pi);
+    await bRx.writeValueWithResponse(new TextEncoder().encode('END'));
+    bLog('END JSON - attendo conferma...','info');
+    await sleep(600);
+  } catch(e) { bLog('Errore JSON: ' + e.message,'err'); po.classList.remove('show'); return; }
+
+  // 2. Invia GIF (solo se il canale è disponibile e ci sono GIF)
+  const gifQueue = [];
+  for(let g = 0; g < esState.length; g++)
+    for(let i = 0; i < esState[g].length; i++) {
+      const es = esState[g][i];
+      if(es._gifFile && es.gif_file) gifQueue.push({file: es._gifFile, path: es.gif_file});
+    }
+
+  if(gifQueue.length === 0) {
+    bLog('Nessuna GIF da inviare.','info');
+  } else if(!bGif) {
+    bLog('⚠️ Canale GIF non disponibile — GIF saltate.','err');
+  } else {
+    bLog('Invio ' + gifQueue.length + ' GIF...','info');
+    for(const g of gifQueue) {
+      try {
+        const bytes = new Uint8Array(await g.file.arrayBuffer());
+        bLog('GIF: ' + g.path + ' (' + bytes.length + ' byte)','info');
+        pi.style.width = '0%';
+        await bGif.writeValueWithResponse(new TextEncoder().encode('GIF_BEGIN:' + g.path));
+        await sleep(200);
+        await inviaChunkBLE(bGif, bytes, 'GIF chunk', pi);
+        await bGif.writeValueWithResponse(new TextEncoder().encode('GIF_END'));
+        bLog('GIF salvata: ' + g.path,'ok');
+        await sleep(300);
+      } catch(err) { bLog('Errore GIF ' + g.path + ': ' + err.message,'err'); }
+    }
+  }
+
+  // 3. FIX: invia DONE → l'ESP32 elabora SOLO ora (dopo JSON + tutte le GIF)
+  try {
+    await bRx.writeValueWithResponse(new TextEncoder().encode('DONE'));
+    bLog('✅ DONE inviato — ESP32 aggiornerà la scheda.','ok');
+  } catch(e) { bLog('Errore DONE: ' + e.message,'err'); }
+
+  setTimeout(() => po.classList.remove('show'), 2000);
+}
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+function scaricaJSON() {
+  buildJSON_internal();
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([JSON.stringify(scheda, null, 2)], {type:'application/json'}));
+  a.download = 'workout.json'; a.click();
+}
+
+function caricaJSON(e) {
+  const f = e.target.files[0]; if(!f) return;
+  const r = new FileReader();
+  r.onload = ev => {
+    try { scheda = JSON.parse(ev.target.result); bLog('JSON caricato: ' + scheda.nome_utente + ', ' + scheda.giorni.length + ' giorni','ok'); }
+    catch { bLog('JSON non valido!','err'); }
+  };
+  r.readAsText(f);
+}
+
+// INIT
+upd();
+if(!navigator.bluetooth) setTimeout(() => bLog('⚠️ Web Bluetooth non supportato. Usa Chrome su Android.','err'), 500);
+</script>
+</body>
+</html>
