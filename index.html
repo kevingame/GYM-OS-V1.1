@@ -450,14 +450,21 @@ Object.entries(DB).forEach(([g, l]) => {
   });
 });
 
-function gifPath(nome, gruppo) {
-  const slug = nome.toLowerCase()
+function gifSlug(nome) {
+  return nome.toLowerCase()
     .replace(/à/g,'a').replace(/è/g,'e').replace(/é/g,'e')
     .replace(/ì/g,'i').replace(/ò/g,'o').replace(/ù/g,'u')
     .replace(/['\u2019]/g,'')
     .replace(/[^a-z0-9\s]/g,'')
     .trim().replace(/\s+/g,'_');
-  return '/gifs/' + gruppo + '/' + slug + '.gif';
+}
+// Percorso per il JSON e per l'ESP32 (con / iniziale)
+function gifPath(nome, gruppo) {
+  return '/gifs/' + gruppo + '/' + gifSlug(nome) + '.gif';
+}
+// Percorso per <img src> nel browser (senza / iniziale, relativo alla pagina)
+function gifPathSrc(nome, gruppo) {
+  return 'gifs/' + gruppo + '/' + gifSlug(nome) + '.gif';
 }
 
 // ══════════════════════════════════════════════════
@@ -494,7 +501,7 @@ function caricaJSONStep1(ev) {
           const primoNome = nomiArr[0] || '';
           const trovato = ALL_ES.find(e => e.nome === primoNome);
           const gifAuto = trovato ? gifPath(primoNome, trovato.gruppo) : '';
-          const gifCustom = es.gif_file && es.gif_file !== gifAuto;
+          const gifCustom = es.gif_file && (es.gif_file.startsWith('/custom/') || es.gif_file !== gifAuto);
           return {
             nome: es.nome || '',
             tipo: es.tipo || 'normale',
@@ -724,28 +731,29 @@ function buildEsCard(g, i, es) {
         <label>GIF personalizzata (opzionale)</label>
         <div style="background:#0a0a0a;border:1px solid var(--border);border-radius:8px;padding:10px 12px;font-size:.78rem;color:var(--muted2);line-height:1.6;margin-bottom:8px">
           📐 <strong style="color:var(--text)">Requisiti:</strong> ~100×100px, sfondo nero<br>
-          🛠 <strong style="color:var(--text)">ezgif.com →</strong> Resize (100px) → Effects → Change Background Color (#000000) → Optimize → Coalesce<br>
-          💾 <strong style="color:var(--text)">Salva nella SD:</strong> <span id="gif-path-hint-${g}-${i}" style="color:var(--gold);font-family:monospace">${es.gif_file ? es.gif_file : '/gifs/GRUPPO/nome_file.gif'}</span>
+          🛠 <strong style="color:var(--text)">ezgif.com →</strong> Resize (100px) → Effects → Background #000 → Optimize → Coalesce<br>
+          💾 <strong style="color:var(--text)">Percorso SD:</strong> <span id="gif-path-hint-${g}-${i}" style="color:var(--gold);font-family:monospace">${es.gif_file ? es.gif_file : '/gifs/GRUPPO/nome_file.gif'}</span>
         </div>
-        <div style="display:flex;gap:8px;align-items:center">
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
           <label class="btn btn-gray btn-sm" style="cursor:pointer;flex:1">
-            ${es._gifPreview ? '✅ GIF caricata' : '📂 Carica GIF per anteprima'}
+            ${es._gifCustom ? '✅ GIF custom caricata' : '📂 Carica GIF personalizzata'}
             <input type="file" accept=".gif,image/gif" style="display:none" onchange="caricaGifPreview(${g},${i},this)">
           </label>
-          ${es._gifPreview ? `<button class="btn btn-red btn-sm" onclick="rimuoviGifPreview(${g},${i})">✕</button>` : ''}
+          ${es._gifCustom ? `<button class="btn btn-red btn-sm" onclick="rimuoviGifPreview(${g},${i})">✕ Rimuovi</button>` : ''}
+          ${es._gifCustom ? `<button class="btn btn-ghost btn-sm" style="border-color:#555" onclick="ripristinaGifDefault(${g},${i})">↺ Default</button>` : ''}
         </div>
         ${es._gifPreview ? `<div style="margin-top:8px;text-align:center">
           <img src="${es._gifPreview}" style="width:100px;height:100px;object-fit:contain;background:#000;border:1px solid var(--border);border-radius:6px">
+          <div style="font-size:.7rem;color:var(--gold);margin-top:4px">📁 Verrà salvata in: ${es.gif_file}</div>
         </div>` : ''}
-        ${es.gif_file ? `<div style="margin-top:8px;background:#1a1000;border:1px solid #4a3000;border-radius:8px;padding:8px 12px;font-size:.76rem;line-height:1.7">
-          ⚠️ <strong style="color:var(--text)">Le GIF NON vengono inviate via BLE.</strong><br>
-          Copia manualmente il file nella SD nel percorso:<br>
+        ${es._gifCustom && es.gif_file ? `<div style="margin-top:8px;background:#0d1a00;border:1px solid #2a4a00;border-radius:8px;padding:8px 12px;font-size:.76rem;line-height:1.7">
+          ✅ <strong style="color:var(--green)">GIF personalizzata attiva.</strong><br>
+          Copia il file nella SD in:<br>
           <code style="color:var(--gold2);word-break:break-all;font-size:.74rem">${es.gif_file}</code>
-          <div style="margin-top:10px;text-align:center">
-            <img src="${es.gif_file}" 
-              style="width:120px;height:120px;object-fit:contain;background:#000;border:1px solid #4a3000;border-radius:6px"
-              onerror="this.style.display='none'">
-          </div>
+        </div>` : ''}
+        ${!es._gifCustom && es.gif_file ? `<div style="margin-top:8px;background:#0a0a1a;border:1px solid #2a2a4a;border-radius:8px;padding:8px 12px;font-size:.76rem;line-height:1.7;color:var(--muted2)">
+          🎞️ GIF di default già presente nella SD:<br>
+          <code style="color:var(--muted2);word-break:break-all;font-size:.74rem">${es.gif_file}</code>
         </div>` : ''}
         <div class="field" style="margin-top:8px">
           <label>Percorso SD (modificabile manualmente)</label>
@@ -770,42 +778,28 @@ function caricaGifPreview(g, i, input) {
   let slug, gruppo, percorsoFinalizzato;
 
   if(circ) {
-    // CIRCUITO: concatena tutti i nomi con underscore
+    // CIRCUITO: slug da tutti i nomi
     const nomi = es.nomi_circuito || [];
     if(!nomi.length) { alert('Aggiungi prima gli esercizi al circuito!'); return; }
-
-    // Genera slug per ogni nome e li unisce
     slug = nomi.map(n =>
       n.toLowerCase()
         .replace(/[àáâ]/g,'a').replace(/[èéê]/g,'e').replace(/[ìí]/g,'i')
         .replace(/[òó]/g,'o').replace(/[ùú]/g,'u')
-        .replace(/[^a-z0-9]/g,'_')
-        .replace(/_+/g,'_')
-        .replace(/^_|_$/g,'')
+        .replace(/[^a-z0-9]/g,'_').replace(/_+/g,'_').replace(/^_|_$/g,'')
     ).join('_');
-
-    // Cerca il gruppo del primo esercizio
-    const trovato = ALL_ES.find(e => e.nome === nomi[0]);
-    gruppo = trovato ? trovato.gruppo : 'Custom';
-    percorsoFinalizzato = `/gifs/${gruppo}/${slug}.gif`;
+    percorsoFinalizzato = `/custom/${slug}.gif`;
 
   } else {
-    // NORMALE: concatena tutti i nomi come il circuito
+    // NORMALE: slug da tutti i nomi
     const nomi = es.nomi_normali || [];
     if(!nomi.length) { alert('Aggiungi prima gli esercizi!'); return; }
-
     slug = nomi.map(n =>
       n.toLowerCase()
         .replace(/[àáâ]/g,'a').replace(/[èéê]/g,'e').replace(/[ìí]/g,'i')
         .replace(/[òó]/g,'o').replace(/[ùú]/g,'u')
-        .replace(/[^a-z0-9]/g,'_')
-        .replace(/_+/g,'_')
-        .replace(/^_|_$/g,'')
+        .replace(/[^a-z0-9]/g,'_').replace(/_+/g,'_').replace(/^_|_$/g,'')
     ).join('_');
-
-    const trovato = ALL_ES.find(e => e.nome === nomi[0]);
-    gruppo = trovato ? trovato.gruppo : 'Custom';
-    percorsoFinalizzato = `/gifs/${gruppo}/${slug}.gif`;
+    percorsoFinalizzato = `/custom/${slug}.gif`;
   }
 
   es.gif_file = percorsoFinalizzato;
@@ -820,22 +814,40 @@ function caricaGifPreview(g, i, input) {
   reader.readAsDataURL(f);
 }
 
+function ripristinaGifDefault(g, i) {
+  esState[g][i]._gifPreview = null;
+  esState[g][i]._gifFile = null;
+  esState[g][i]._gifCustom = false;
+  const es = esState[g][i];
+  if(es.tipo === 'circuito' && es.nomi_circuito.length > 0) {
+    const primoNome = es.nomi_circuito[0];
+    const trovato = ALL_ES.find(e => e.nome === primoNome);
+    es.gif_file = trovato ? gifPath(primoNome, trovato.gruppo) : '';
+  } else if(es.tipo !== 'circuito' && es.nomi_normali.length > 0) {
+    const primoNome = es.nomi_normali[0];
+    const trovato = ALL_ES.find(e => e.nome === primoNome);
+    es.gif_file = trovato ? gifPath(primoNome, trovato.gruppo) : '';
+  } else {
+    es.gif_file = '';
+  }
+  renderEsPanel();
+}
+
 function rimuoviGifPreview(g, i) {
   esState[g][i]._gifPreview = null;
   esState[g][i]._gifFile = null;
-  esState[g][i]._gifCustom = false; // ← aggiunto
-  // ricalcola gif automatica se ci sono esercizi normali
+  esState[g][i]._gifCustom = false;
   const es = esState[g][i];
+  // Ripristina gif di default dal primo esercizio
   if(es.tipo !== 'circuito' && es.nomi_normali.length > 0) {
-    // Se un solo esercizio → gif automatica dal primo nome
-    // Se più esercizi → nessuna gif automatica (serviva quella custom)
-    if(es.nomi_normali.length === 1) {
-      const primoNome = es.nomi_normali[0];
-      const trovato = ALL_ES.find(e => e.nome === primoNome);
-      es.gif_file = trovato ? gifPath(primoNome, trovato.gruppo) : '';
-    } else {
-      es.gif_file = '';
-    }
+    const primoNome = es.nomi_normali[0];
+    const trovato = ALL_ES.find(e => e.nome === primoNome);
+    es.gif_file = trovato ? gifPath(primoNome, trovato.gruppo) : '';
+  } else if(es.tipo === 'circuito' && es.nomi_circuito.length > 0) {
+    // Per il circuito: gif di default = primo esercizio del circuito
+    const primoNome = es.nomi_circuito[0];
+    const trovato = ALL_ES.find(e => e.nome === primoNome);
+    es.gif_file = trovato ? gifPath(primoNome, trovato.gruppo) : '';
   } else {
     es.gif_file = '';
   }
@@ -849,13 +861,22 @@ function aggiornaGifHint(g, i, val) {
 
 function removeCircTag(g, i, ti) {
   esState[g][i].nomi_circuito.splice(ti, 1);
+  if(!esState[g][i]._gifCustom) {
+    if(esState[g][i].nomi_circuito.length > 0) {
+      const primoNome = esState[g][i].nomi_circuito[0];
+      const trovato = ALL_ES.find(e => e.nome === primoNome);
+      esState[g][i].gif_file = trovato ? gifPath(primoNome, trovato.gruppo) : '';
+    } else {
+      esState[g][i].gif_file = '';
+    }
+  }
   esState[g][i].nome = esState[g][i].nomi_circuito.join(', ');
   renderEsPanel();
 }
 
 function removeNormTag(g, i, ti) {
   esState[g][i].nomi_normali.splice(ti, 1);
-  if(!esState[g][i]._gifCustom) {  // ← non toccare gif custom
+  if(!esState[g][i]._gifCustom) {
     if(esState[g][i].nomi_normali.length > 0) {
       const primoNome = esState[g][i].nomi_normali[0];
       const trovato = ALL_ES.find(e => e.nome === primoNome);
@@ -932,7 +953,7 @@ function buildSearchItem(g, i, e) {
     ? `<br><span style="font-size:.62rem;color:var(--muted);font-style:italic;line-height:1.2">${alias.split(' ').slice(0,4).join(' ')}</span>`
     : '';
 
-  const gp = gifPath(e.nome, e.gruppo);
+  const gp = gifPathSrc(e.nome, e.gruppo);
 
   return `<div class="search-item" style="flex-direction:row;align-items:center;gap:8px"
     data-g="${g}" data-i="${i}"
@@ -955,7 +976,13 @@ function selEsFromEl(el) {
   const es = esState[g][i];
   if(es.tipo === 'circuito') {
     if(!es.nomi_circuito) es.nomi_circuito = [];
-    if(!es.nomi_circuito.includes(nome)) es.nomi_circuito.push(nome);
+    if(!es.nomi_circuito.includes(nome)) {
+      es.nomi_circuito.push(nome);
+      // gif di default = primo esercizio del circuito
+      if(es.nomi_circuito.length === 1 && !es._gifCustom) {
+        es.gif_file = gifPath(nome, gruppo);
+      }
+    }
     es.nome = es.nomi_circuito.join(', ');
   } else {
     if(!es.nomi_normali) es.nomi_normali = [];
